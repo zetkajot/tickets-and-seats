@@ -26,8 +26,9 @@ export default class MemoryStorageVendor implements CombinedStorageVendor {
     });
   }
 
-  deleteEvent(eventId: string): Promise<void> {
-    throw new Error('Method not implemented.');
+  async deleteEvent(eventId: string): Promise<void> {
+    const targetId = this.eventStorage.findIndex((data) => data.id === eventId);
+    this.eventStorage.splice(targetId, 1);
   }
 
   async saveHall(data: StoredHallData): Promise<void> {
@@ -43,19 +44,27 @@ export default class MemoryStorageVendor implements CombinedStorageVendor {
     });
   }
 
-  deleteHall(hallId: string): Promise<void> {
-    throw new Error('Method not implemented.');
+  async deleteHall(hallId: string): Promise<void> {
+    const targetId = this.hallStorage.findIndex((data) => data.id === hallId);
+    this.hallStorage.splice(targetId, 1);
   }
 
   async saveTicket(data: StoredTicketData): Promise<void> {
     this.ticketStorage.push(data);
   }
 
-  findTicket(data: Partial<StoredTicketData>): Promise<StoredTicketData[]> {
-    throw new Error('Method not implemented.');
+  async findTicket(data: Partial<StoredTicketData>): Promise<StoredTicketData[]> {
+    return this.ticketStorage.filter(({ id, eventId, seatNo }) => {
+      let isMatching = false;
+      isMatching = id === data.id || data.id === undefined;
+      isMatching = eventId === data.eventId || data.eventId === undefined;
+      isMatching = seatNo === data.seatNo || data.seatNo === undefined;
+      return isMatching;
+    });
   }
 
-  deleteTicket(ticketId: string): Promise<void> {
-    throw new Error('Method not implemented.');
+  async deleteTicket(ticketId: string): Promise<void> {
+    const targetId = this.ticketStorage.findIndex((data) => data.id === ticketId);
+    this.ticketStorage.splice(targetId, 1);
   }
 }

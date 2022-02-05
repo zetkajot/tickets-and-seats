@@ -125,7 +125,7 @@ describe('MemoryStorageVendor test suite', () => {
   });
   describe('deleteTicket', () => {
     it('Removes StoredTicketData matching given id from internal storage', async () => {
-      await memoryStorage.deleteHall('example-ticket-id');
+      await memoryStorage.deleteTicket('example-ticket-id');
 
       expect(ticketStorage).to.not.deep.include(validTicketData);
     });
