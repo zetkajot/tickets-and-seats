@@ -6,56 +6,57 @@ import OpenEvent from '../../use-cases/event/open-event';
 import CreateHall from '../../use-cases/hall/create-hall';
 import FindHallById from '../../use-cases/hall/find-hall-by-id';
 import IssueTicket from '../../use-cases/ticket/issue-ticket';
-import convertToCloseEventInput from '../request-converters/convert-to-close-event-input';
-import convertToCreateEventInput from '../request-converters/convert-to-create-event-input';
-import convertToCreateHallInput from '../request-converters/convert-to-create-hall-input';
-import convertToFindEventByIdInput from '../request-converters/convert-to-find-event-by-id-input';
-import convertToFindHallByIdInput from '../request-converters/convert-to-find-hall-by-id-input';
-import convertToGetSeatsInfoInput from '../request-converters/convert-to-get-seats-info-input';
-import convertToIssueTicketInput from '../request-converters/convert-to-issue-ticket-input';
-import convertToOpenEventInput from '../request-converters/convert-to-open-event-input';
+import toCloseEventInputTemplate from '../request-converters/converter-templates/to-close-event-input-template';
+import toCreateEventInputTemplate from '../request-converters/converter-templates/to-create-event-input-template';
+import toCreateHallInputTemplate from '../request-converters/converter-templates/to-create-hall-input-template';
+import toFindEventByIdInputTemplate from '../request-converters/converter-templates/to-find-event-by-id-input-template';
+import toFindHallByIdInputTemplate from '../request-converters/converter-templates/to-find-hall-by-id-input-template';
+import toGetSeatsInfoInputTemplate from '../request-converters/converter-templates/to-get-seats-info-input-template';
+import toIssueTicketInputTemplate from '../request-converters/converter-templates/to-issue-ticket-input-template';
+import toOpenEventInputTemplate from '../request-converters/converter-templates/to-open-event-input-template';
+import makeInputConverter from '../request-converters/make-input-converter';
 import { ActionSchema } from '../types/action-schema';
 
 const basicSchema: ActionSchema = [
   {
     actionName: 'create-event',
     targetUseCase: CreateEvent,
-    convertRequestToInput: <any>convertToCreateEventInput,
+    convertRequestToInput: makeInputConverter(...toCreateEventInputTemplate),
   },
   {
     actionName: 'find-event-by-id',
     targetUseCase: FindEventById,
-    convertRequestToInput: <any>convertToFindEventByIdInput,
+    convertRequestToInput: makeInputConverter(...toFindEventByIdInputTemplate),
   },
   {
     actionName: 'close-event',
     targetUseCase: CloseEvent,
-    convertRequestToInput: <any>convertToCloseEventInput,
+    convertRequestToInput: makeInputConverter(...toCloseEventInputTemplate),
   },
   {
     actionName: 'open-event',
     targetUseCase: OpenEvent,
-    convertRequestToInput: <any>convertToOpenEventInput,
+    convertRequestToInput: makeInputConverter(...toOpenEventInputTemplate),
   },
   {
     actionName: 'get-event-seat-info',
     targetUseCase: GetSeatsInfo,
-    convertRequestToInput: <any>convertToGetSeatsInfoInput,
+    convertRequestToInput: makeInputConverter(...toGetSeatsInfoInputTemplate),
   },
   {
     actionName: 'issue-ticket',
     targetUseCase: IssueTicket,
-    convertRequestToInput: <any>convertToIssueTicketInput,
+    convertRequestToInput: makeInputConverter(...toIssueTicketInputTemplate),
   },
   {
     actionName: 'create-hall',
     targetUseCase: CreateHall,
-    convertRequestToInput: <any>convertToCreateHallInput,
+    convertRequestToInput: makeInputConverter(...toCreateHallInputTemplate),
   },
   {
     actionName: 'find-hall-by-id',
     targetUseCase: FindHallById,
-    convertRequestToInput: <any>convertToFindHallByIdInput,
+    convertRequestToInput: makeInputConverter(...toFindHallByIdInputTemplate),
   },
 ];
 
