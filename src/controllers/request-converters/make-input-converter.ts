@@ -10,7 +10,7 @@ type ComplexConverterFactorySetting = {
 
 type ValueConverter = (value: string) => any;
 
-type ConverterFactorySettings = (ComplexConverterFactorySetting | string)[];
+export type ConverterFactorySettings = (ComplexConverterFactorySetting | string)[];
 
 type Converter = (request: ControllerRequest) => any;
 
