@@ -3,24 +3,29 @@ import InvalidRequestError from '../../errors/invalid-request-error';
 import { ConverterFactorySettings } from '../make-input-converter';
 
 const toCreateEventInputTemplate: ConverterFactorySettings = [
-  'name',
+  {
+    argumentName: 'name',
+    desiredName: 'eventName',
+  },
   'hallId',
   {
     argumentName: 'startingDate',
     valueConverter: getDateFromString,
+    desiredName: 'eventStartingDate',
   },
   {
     argumentName: 'endingDate',
     valueConverter: getDateFromString,
+    desiredName: 'eventEndingDate',
   },
 ];
 
 function getDateFromString(val: string): Date {
-  const convertedDate = new Date(val);
-  if (!val) {
-    ErrorFactory.getInstance().makeError(InvalidRequestError);
+  const convertedTime = Date.parse(val);
+  if (Number.isNaN(convertedTime)) {
+    throw ErrorFactory.getInstance().makeError(InvalidRequestError);
   }
-  return convertedDate;
+  return new Date(convertedTime);
 }
 
 export default toCreateEventInputTemplate;
