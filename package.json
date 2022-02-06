@@ -6,7 +6,7 @@
   "license": "ISC",
   "description": "Automaticaly generated description",
   "scripts": {
-    "test": "mocha -r ts-node/register --reporter Nyan --full-trace src/**/*.spec.ts",
+    "test": "mocha -r ts-node/register --full-trace src/**/*.spec.ts",
     "start": "node dist/main.js",
     "build": "tsc"
   },

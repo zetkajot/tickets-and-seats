@@ -23,7 +23,7 @@ describe('makeInputConverter test suite', () => {
         expect(tryConverting).to.throw(InvalidRequestError);
       });
     });
-    describe('When not all of request arguments names match required those required', () => {
+    describe('When not all of request arguments names match those required', () => {
       it('Throws InvalidRequestError', () => {
         const converter = makeInputConverter('arg1', 'arg2');
         const request = {
@@ -131,7 +131,7 @@ describe('makeInputConverter test suite', () => {
 
           const output = converter(request);
 
-          expect(output).to.deep.equal({ args1: '-some-value-' });
+          expect(output).to.deep.equal({ arg1: '-some-value-' });
         });
       });
     });
