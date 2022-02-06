@@ -5,74 +5,74 @@ import { ControllerRequest } from '../types/controller-request';
 type ComplexConverterFactorySetting = {
   argumentName: string,
   desiredName?: string,
-  valueConverter?: (value: string) => any,
+  valueConverter?: ValueConverter
 };
+
+type ValueConverter = (value: string) => any;
 
 type ConverterFactorySettings = (ComplexConverterFactorySetting | string)[];
 
 type Converter = (request: ControllerRequest) => any;
 
 export default function makeInputConverter(...settings: ConverterFactorySettings): Converter {
+  const settingsMap = getSettingsMap(settings);
   return function inputConverter(request: ControllerRequest) {
     const { args } = request;
 
-    if (args.length < settings.length) {
+    if (args.length < settingsMap.size) {
       throw ErrorFactory.getInstance().makeError(InvalidRequestError);
     }
 
-    const returnedObject: { [k: string]: any } = {};
+    const returnedObject: { [k:string]: any } = {};
+
+    const usedArgNames = new Set<string>();
 
     args.forEach(({ name, value }) => {
-      const argSetting = getSettingsForArgName(name);
-      let actualArgName;
-      let actualArgValue;
-      if (isComplexSetting(argSetting)) {
-        ({ actualArgName, actualArgValue } = applySettingsForArgument(name, value));
-      } else {
-        [actualArgName, actualArgValue] = [name, value];
-      }
-      if (actualArgName in returnedObject) {
+      if (usedArgNames.has(name)) {
         throw ErrorFactory.getInstance().makeError(InvalidRequestError);
       }
-      returnedObject[actualArgName] = actualArgValue;
+      const argSetting = settingsMap.get(name);
+      if (argSetting) {
+        returnedObject[argSetting.desiredName] = argSetting.valueConverter(value);
+        usedArgNames.add(name);
+      }
     });
+
+    if (usedArgNames.size !== settingsMap.size) {
+      throw ErrorFactory.getInstance().makeError(InvalidRequestError);
+    }
 
     return returnedObject;
   };
+}
 
-  function applySettingsForArgument(
-    argName: string,
-    argValue: string,
-  ): { actualArgName: string, actualArgValue: any } {
-    const setting = getSettingsForArgName(argName);
-    if (isComplexSetting(setting)) {
-      const valueConverter = setting.valueConverter ?? ((val: string) => val);
-      return {
-        actualArgName: setting.desiredName ?? argName,
-        actualArgValue: valueConverter(argValue),
-      };
-    }
-    return {
-      actualArgName: argName,
-      actualArgValue: argValue,
-    };
-  }
+function getSettingsMap(
+  settings: ConverterFactorySettings,
+): Map<string, { desiredName: string, valueConverter: ValueConverter }> {
+  const settingsMap = new Map<string, { desiredName: string, valueConverter: ValueConverter }>();
 
-  function getSettingsForArgName(argName: string): ComplexConverterFactorySetting | string {
-    const foundSetting = settings.find((setting) => {
-      const expectedArgName = isComplexSetting(setting) ? setting.argumentName : setting;
-      return argName === expectedArgName;
+  settings.forEach((setting) => {
+    const argName = getArgumentNameFromSetting(setting);
+    settingsMap.set(argName, {
+      desiredName: getDesiredNameFromSetting(setting),
+      valueConverter: getValueConverterFromSetting(setting),
     });
+  });
 
-    if (foundSetting) {
-      return foundSetting;
-    }
-    throw ErrorFactory.getInstance().makeError(InvalidRequestError);
-  }
+  return settingsMap;
+}
 
-  function isComplexSetting(
-    setting: string | ComplexConverterFactorySetting,
-  ): setting is ComplexConverterFactorySetting {
-    return typeof setting !== 'string';
-  }
+function getArgumentNameFromSetting(setting: string | ComplexConverterFactorySetting): string {
+  return typeof setting === 'string' ? setting : setting.argumentName;
+}
+
+function getDesiredNameFromSetting(setting: string | ComplexConverterFactorySetting): string {
+  return typeof setting === 'string' ? setting : setting.desiredName ?? setting.argumentName;
+}
+
+function getValueConverterFromSetting(
+  setting: string | ComplexConverterFactorySetting,
+): ValueConverter {
+  const fakeConverter = (value: string) => value;
+  return typeof setting === 'string' ? fakeConverter : setting.valueConverter ?? fakeConverter;
 }
