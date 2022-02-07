@@ -156,7 +156,7 @@ export default function testEntityActionsFactory<Entity, EntityData>(
 
         const output = await findUnique(exampleUniqueIdentifier);
 
-        expect(output).to.deep.equal([exampleEntity]);
+        expect(output).to.deep.equal(exampleEntity);
       });
     });
     describe('When more than one entities match given param', () => {
@@ -165,7 +165,7 @@ export default function testEntityActionsFactory<Entity, EntityData>(
         const findUnique = new Factory(vendor).makeFindUnique();
 
         return expect(findUnique(exampleUniqueIdentifier))
-          .to.eventually.be.rejectedWith(InvalidDataError);
+          .to.eventually.be.rejectedWith(DiscrepancyError);
       });
     });
   });
@@ -199,7 +199,7 @@ export default function testEntityActionsFactory<Entity, EntityData>(
 
         const result = await findUniqueRelated(exampleParams);
 
-        expect(result).to.deep.equal([exampleEntity]);
+        expect(result).to.deep.equal(exampleEntity);
       });
     });
     describe('When more than one entities match given param', () => {
