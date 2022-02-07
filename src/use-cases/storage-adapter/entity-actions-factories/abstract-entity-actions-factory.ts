@@ -10,6 +10,6 @@ export default abstract class AbstractEntityActionsFactory<Entity, EntityData> {
   abstract makeFindManyRelated(): FindMany<Entity, EntityData>;
   abstract makeFindUnique<T>(): FindOne<Entity, T>;
   abstract makeFindUniqueRelated<T>(): FindOne<Entity, T>;
-  abstract makeDeleteOne(entity: Entity): DeleteOne<Entity>;
+  abstract makeDeleteOne(): DeleteOne<Entity>;
   abstract makeSaveOne(): SaveOne<Entity>;
 }
