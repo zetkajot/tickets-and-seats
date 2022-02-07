@@ -42,9 +42,9 @@ export default function testEntityActionsFactory<Entity, EntityData>(
       let wasFindMethodCalled = false;
       const spiedVendor: CombinedStorageVendor = {
         ...Object.create(uselessStorageVendor),
-        findEvent: () => { wasFindMethodCalled = true; },
-        findHall: () => { wasFindMethodCalled = true; },
-        findTicket: () => { wasFindMethodCalled = true; },
+        findEvent: () => { wasFindMethodCalled = true; return [exampleEntityData]; },
+        findHall: () => { wasFindMethodCalled = true; return [exampleEntityData]; },
+        findTicket: () => { wasFindMethodCalled = true; return [exampleEntityData]; },
       };
       const findMany = new Factory(spiedVendor).makeFindMany();
       await findMany(exampleParams);
@@ -87,9 +87,9 @@ export default function testEntityActionsFactory<Entity, EntityData>(
       let wasFindMethodCalled = false;
       const spiedVendor: CombinedStorageVendor = {
         ...Object.create(uselessStorageVendor),
-        findEvent: async () => { wasFindMethodCalled = true; },
-        findHall: async () => { wasFindMethodCalled = true; },
-        findTicket: async () => { wasFindMethodCalled = true; },
+        findEvent: async () => { wasFindMethodCalled = true; return [exampleEntityData]; },
+        findHall: async () => { wasFindMethodCalled = true; return [exampleEntityData]; },
+        findTicket: async () => { wasFindMethodCalled = true; return [exampleEntityData]; },
       };
       const findManyRelated = new Factory(spiedVendor).makeFindManyRelated();
       await findManyRelated(exampleParams);
