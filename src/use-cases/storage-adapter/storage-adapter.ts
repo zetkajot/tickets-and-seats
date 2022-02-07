@@ -12,6 +12,7 @@ export default interface StorageAdapter {
   findUniqueRelatedEvent: (eventId: string) => Promise<Event>;
   saveEvent: (event: Event) => Promise<void>;
   deleteEvent: (eventId: string) => Promise<void>;
+  replaceHallDummy: (event: Event) => Promise<Event>;
 
   findHalls: (hallParams: Partial<Omit<StoredHallData, 'layout' | 'id' >>) => Promise<Hall[]>,
   findRelatedHalls: (hallParams: Partial<Omit<StoredHallData, 'layout' | 'id' >>) => Promise<Hall[]>,

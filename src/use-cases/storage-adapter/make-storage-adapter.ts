@@ -8,6 +8,7 @@ import { StoredTicketData } from '../../infrastracture/storage-vendors/ticket-st
 import deconstructEvent from '../use-case-utils/deconstructors/deconstruct-event';
 import deconstructHall from '../use-case-utils/deconstructors/deconstruct-hall';
 import deconstructTicket from '../use-case-utils/deconstructors/deconstruct-ticket';
+import makeDummyLayout from '../use-case-utils/dummies/make-dummy-layout';
 import makeHallDummy from '../use-case-utils/dummies/make-hall-dummy';
 import reconstructEvent from '../use-case-utils/reconstructors/reconstruct-event';
 import reconstructHall from '../use-case-utils/reconstructors/reconstruct-hall';
@@ -36,6 +37,7 @@ export default function makeStorageAdapter(storageVendor: CombinedStorageVendor)
     findUniqueTicket,
     saveTicket,
     deleteTicket,
+    replaceHallDummy,
   };
 
   async function findEvents(
@@ -200,7 +202,7 @@ export default function makeStorageAdapter(storageVendor: CombinedStorageVendor)
     return eventDataSet.map((eventData) => tryReconstructing(
       reconstructEvent,
       eventData,
-      makeHallDummy(eventData.hallId),
+      makeHallDummy(eventData.hallId, 'dummy hall', makeDummyLayout(eventData.reservedSeats)),
     ));
   }
 
@@ -243,5 +245,12 @@ export default function makeStorageAdapter(storageVendor: CombinedStorageVendor)
     return Promise.all(promiseArray).then((tickets) => tickets).catch((error) => {
       throw error;
     });
+  }
+
+  async function replaceHallDummy(event: Event): Promise<Event> {
+    const { hallId } = event;
+    const hall = await findUniqueRelatedHall(hallId);
+    const eventData = deconstructEvent(event);
+    return tryReconstructing(reconstructEvent, eventData, hall);
   }
 }

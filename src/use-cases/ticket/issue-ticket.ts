@@ -1,16 +1,12 @@
 import { randomUUID } from 'crypto';
 import Event from '../../domain/event';
-import UseCase from '../use-case';
-import tryReconstructing from '../use-case-utils/try-catch-shorthands/try-reconstructing';
-import reconstructEvent from '../use-case-utils/reconstructors/reconstruct-event';
-import reconstructHall from '../use-case-utils/reconstructors/reconstruct-hall';
 import Hall from '../../domain/hall';
-import { StoredHallData } from '../../infrastracture/storage-vendors/hall-storage-vendor';
-import { StoredEventData } from '../../infrastracture/storage-vendors/event-storage-vendor';
-import tryFindingEntityData from '../use-case-utils/try-catch-shorthands/try-finding-entity-data';
-import tryEntityInteraction from '../use-case-utils/try-catch-shorthands/try-entity-interaction';
-import tryExecutingStorageQuery from '../use-case-utils/try-catch-shorthands/try-executing-storage-query';
+import Ticket from '../../domain/ticket';
+import UseCase from '../use-case';
 import deconstructEvent from '../use-case-utils/deconstructors/deconstruct-event';
+import reconstructEvent from '../use-case-utils/reconstructors/reconstruct-event';
+import tryEntityInteraction from '../use-case-utils/try-catch-shorthands/try-entity-interaction';
+import tryReconstructing from '../use-case-utils/try-catch-shorthands/try-reconstructing';
 
 type Input = {
   eventId: string,
@@ -29,55 +25,31 @@ type Output = {
 
 export default class IssueTicket extends UseCase<Input, Output> {
   async execute({ eventId, seatNo }: Input): Promise<Output> {
-    const eventData = await this.findEventData(eventId);
-    const relatedHallData = await this.findRelatedHallData(eventData.hallId);
-
-    const relatedHall = <Hall> tryReconstructing(reconstructHall, relatedHallData);
-    const event = <Event> tryReconstructing(reconstructEvent, eventData, relatedHall);
-
+    let event = await this.adaptedDataVendor.findUniqueEvent(eventId);
+    const hall = await this.adaptedDataVendor.findUniqueRelatedHall(event.hallId);
+    event = this.plugHallToEvent(hall, event);
     tryEntityInteraction()(event.reserveSeat.bind(event), seatNo);
-
-    tryExecutingStorageQuery(
-      this.dataVendor.saveEvent.bind(this.dataVendor),
-      deconstructEvent(event),
-    );
-
-    const ticketData = {
+    const ticket: Ticket = {
+      event,
       id: randomUUID(),
-      eventId: event.id,
       seatNo,
     };
-
-    tryExecutingStorageQuery(this.dataVendor.saveTicket.bind(this.dataVendor), ticketData);
-
+    await this.adaptedDataVendor.saveEvent(event);
+    await this.adaptedDataVendor.saveTicket(ticket);
     return {
-      ticketId: ticketData.id,
       eventId: event.id,
       eventName: event.name,
-      hallName: relatedHall.name,
-      seatNo,
-      eventStartingDate: event.startsAt,
       eventEndingDate: event.endsAt,
+      eventStartingDate: event.startsAt,
+      hallName: hall.name,
+      seatNo: ticket.seatNo,
+      ticketId: ticket.id,
     };
   }
 
-  private async findRelatedHallData(hallId: string): Promise<StoredHallData> {
-    const hallData = <StoredHallData> (await tryFindingEntityData.customized({
-      allowEmpty: false,
-      related: true,
-      unique: true,
-    })(this.dataVendor.findHall.bind(this.dataVendor), { id: hallId }))[0];
-
-    return hallData;
-  }
-
-  private async findEventData(eventId: string): Promise<StoredEventData> {
-    const eventData = <StoredEventData> (await tryFindingEntityData.customized({
-      allowEmpty: false,
-      related: false,
-      unique: true,
-    })(this.dataVendor.findEvent.bind(this.dataVendor), { id: eventId }))[0];
-
-    return eventData;
+  // eslint-disable-next-line class-methods-use-this
+  private plugHallToEvent(hall: Hall, event: Event): Event {
+    const eventData = deconstructEvent(event);
+    return tryReconstructing(reconstructEvent, eventData, hall);
   }
 }
