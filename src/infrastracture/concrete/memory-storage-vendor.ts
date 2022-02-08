@@ -17,13 +17,10 @@ export default class MemoryStorageVendor implements CombinedStorageVendor {
   }
 
   async findEvent(data: Partial<Pick<StoredEventData, 'id' | 'name' | 'hallId'>>): Promise<StoredEventData[]> {
-    return this.eventStorage.filter(({ id, name, hallId }) => {
-      let isMatching = false;
-      isMatching = id === data.id || data.id === undefined;
-      isMatching = name === data.name || data.name === undefined;
-      isMatching = hallId === data.hallId || data.hallId === undefined;
-      return isMatching;
-    });
+    return this.eventStorage.filter(({ id, name, hallId }) => (
+      id === data.id || data.id === undefined)
+      && (name === data.name || data.name === undefined)
+      && (hallId === data.hallId || data.hallId === undefined));
   }
 
   async deleteEvent(eventId: string): Promise<void> {
@@ -36,12 +33,10 @@ export default class MemoryStorageVendor implements CombinedStorageVendor {
   }
 
   async findHall(data: Partial<Omit<StoredHallData, 'layout'>>): Promise<StoredHallData[]> {
-    return this.hallStorage.filter(({ id, name }) => {
-      let isMatching = false;
-      isMatching = id === data.id || data.id === undefined;
-      isMatching = name === data.name || data.name === undefined;
-      return isMatching;
-    });
+    return this.hallStorage.filter(({ id, name }) => (
+      (id === data.id || data.id === undefined)
+      && (name === data.name || data.name === undefined)
+    ));
   }
 
   async deleteHall(hallId: string): Promise<void> {
@@ -54,13 +49,11 @@ export default class MemoryStorageVendor implements CombinedStorageVendor {
   }
 
   async findTicket(data: Partial<StoredTicketData>): Promise<StoredTicketData[]> {
-    return this.ticketStorage.filter(({ id, eventId, seatNo }) => {
-      let isMatching = false;
-      isMatching = id === data.id || data.id === undefined;
-      isMatching = eventId === data.eventId || data.eventId === undefined;
-      isMatching = seatNo === data.seatNo || data.seatNo === undefined;
-      return isMatching;
-    });
+    return this.ticketStorage.filter(({ id, eventId, seatNo }) => (
+      (id === data.id || data.id === undefined)
+      && (eventId === data.eventId || data.eventId === undefined)
+      && (seatNo === data.seatNo || data.seatNo === undefined)
+    ));
   }
 
   async deleteTicket(ticketId: string): Promise<void> {

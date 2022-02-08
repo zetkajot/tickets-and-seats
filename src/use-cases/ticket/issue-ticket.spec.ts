@@ -7,7 +7,7 @@ import IssueTicket from './issue-ticket';
 const validEventData = Object.freeze({
   id: 'event id',
   name: 'example name',
-  hallId: 'hall id',
+  hallId: 'example hall id',
   startsAt: new Date('2022'),
   endsAt: new Date('2023'),
   isOpen: true,
@@ -15,7 +15,7 @@ const validEventData = Object.freeze({
 });
 
 const validHallData = Object.freeze({
-  id: 'hall id',
+  id: 'example hall id',
   name: 'example hall',
   layout: [
     [1, 0, 0],
@@ -111,7 +111,7 @@ describe('Issue Ticket Use Case test suite', () => {
         eventName: 'example name',
         eventId: 'event id',
         seatNo: 1,
-        hallName: 'example hall',
+        hallId: 'example hall id',
         eventStartingDate: new Date('2022'),
         eventEndingDate: new Date('2023'),
       });
