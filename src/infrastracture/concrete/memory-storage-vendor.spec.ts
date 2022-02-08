@@ -95,6 +95,13 @@ describe('MemoryStorageVendor test suite', () => {
 
       expect(foundData).to.deep.equal([validHallData]);
     });
+    it('Returns empty array when no criteria match', async () => {
+      const foundData = await memoryStorage.findHall({
+        name: 'not existing hall',
+      });
+
+      expect(foundData).to.deep.equal([]);
+    });
   });
   describe('findTicket', () => {
     it('Returns an array of StoredTicketData matching all provided criteria', async () => {
@@ -105,6 +112,13 @@ describe('MemoryStorageVendor test suite', () => {
 
       expect(foundData).to.deep.equal([validTicketData]);
     });
+    it('Returns empty array when no criteria match', async () => {
+      const foundData = await memoryStorage.findTicket({
+        eventId: 'not existing event id',
+      });
+
+      expect(foundData).to.deep.equal([]);
+    });
   });
   describe('findEvent', () => {
     it('Returns an array of StoredEventData matching all provided criteria', async () => {
@@ -114,6 +128,13 @@ describe('MemoryStorageVendor test suite', () => {
       });
 
       expect(foundData).to.deep.equal([validEventData]);
+    });
+    it('Returns empty array when no criteria match', async () => {
+      const foundData = await memoryStorage.findEvent({
+        name: 'not existing event name',
+      });
+
+      expect(foundData).to.deep.equal([]);
     });
   });
   describe('deleteHall', () => {
