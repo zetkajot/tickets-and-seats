@@ -22,8 +22,8 @@ export default interface StorageAdapter {
   deleteHall: (hallId: string) => Promise<void>,
 
   saveTicket: (ticket: Ticket) => Promise<void>,
-  findTickets: (ticket: Partial<Omit<StoredTicketData, 'seatNo'>>) => Promise<Ticket[]>;
-  findRelatedTickets: (ticket: Partial<Omit<StoredTicketData, 'seatNo'>>) => Promise<Ticket[]>;
+  findTickets: (ticket: Partial<Omit<StoredTicketData, 'seatNo' | 'id' >>) => Promise<Ticket[]>;
+  findRelatedTickets: (ticket: Partial<Omit<StoredTicketData, 'seatNo' | 'id' >>) => Promise<Ticket[]>;
   findUniqueTicket: (ticketId: string) => Promise<Ticket>,
   findUniqueRelatedTicket: (ticketId: string) => Promise<Ticket>,
   deleteTicket: (ticketId: string) => Promise<void>;
