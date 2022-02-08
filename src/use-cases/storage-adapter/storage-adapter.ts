@@ -11,21 +11,21 @@ export default interface StorageAdapter {
   findUniqueEvent: (eventId: string) => Promise<Event>;
   findUniqueRelatedEvent: (eventId: string) => Promise<Event>;
   saveEvent: (event: Event) => Promise<void>;
-  deleteEvent: (eventId: string) => Promise<void>;
-  plugRealHall: (event: Event) => Promise<void>;
+  deleteEvent: (event: Event) => Promise<void>;
+  plugRealHall: (event: Event) => Promise<Event>;
 
   findHalls: (hallParams: Partial<Omit<StoredHallData, 'layout' | 'id' >>) => Promise<Hall[]>,
   findRelatedHalls: (hallParams: Partial<Omit<StoredHallData, 'layout' | 'id' >>) => Promise<Hall[]>,
   findUniqueHall: (hallId: string) => Promise<Hall>,
   findUniqueRelatedHall: (hallId: string) => Promise<Hall>,
   saveHall: (hall: Hall) => Promise<void>,
-  deleteHall: (hallId: string) => Promise<void>,
+  deleteHall: (hall: Hall) => Promise<void>,
 
   saveTicket: (ticket: Ticket) => Promise<void>,
   findTickets: (ticket: Partial<Omit<StoredTicketData, 'seatNo' | 'id' >>) => Promise<Ticket[]>;
   findRelatedTickets: (ticket: Partial<Omit<StoredTicketData, 'seatNo' | 'id' >>) => Promise<Ticket[]>;
   findUniqueTicket: (ticketId: string) => Promise<Ticket>,
   findUniqueRelatedTicket: (ticketId: string) => Promise<Ticket>,
-  deleteTicket: (ticketId: string) => Promise<void>;
-  plugRealEvent: (ticket: Ticket) => Promise<void>;
+  deleteTicket: (ticket: Ticket) => Promise<void>;
+  plugRealEvent: (ticket: Ticket) => Promise<Ticket>;
 }
