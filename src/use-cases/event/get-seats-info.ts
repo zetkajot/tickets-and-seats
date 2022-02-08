@@ -20,7 +20,6 @@ export default class GetSeatsInfo extends UseCase<Input, Output> {
     const event = await this.adaptedDataVendor.findUniqueEvent(eventId);
     const hall = await this.adaptedDataVendor.findUniqueRelatedHall(event.hallId);
     const [reservedSeats, freeSeats] = this.getReservedAndFreeSeats(event, hall);
-
     return {
       eventId: event.id,
       hallId: hall.id,
