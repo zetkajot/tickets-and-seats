@@ -12,7 +12,7 @@ export default interface StorageAdapter {
   findUniqueRelatedEvent: (eventId: string) => Promise<Event>;
   saveEvent: (event: Event) => Promise<void>;
   deleteEvent: (eventId: string) => Promise<void>;
-  replaceHallDummy: (event: Event) => Promise<Event>;
+  plugRealHall: (event: Event) => Promise<void>;
 
   findHalls: (hallParams: Partial<Omit<StoredHallData, 'layout' | 'id' >>) => Promise<Hall[]>,
   findRelatedHalls: (hallParams: Partial<Omit<StoredHallData, 'layout' | 'id' >>) => Promise<Hall[]>,
@@ -27,4 +27,5 @@ export default interface StorageAdapter {
   findUniqueTicket: (ticketId: string) => Promise<Ticket>,
   findUniqueRelatedTicket: (ticketId: string) => Promise<Ticket>,
   deleteTicket: (ticketId: string) => Promise<void>;
+  plugRealEvent: (ticket: Ticket) => Promise<void>;
 }
