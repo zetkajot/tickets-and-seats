@@ -1,11 +1,11 @@
 import Event from '../../../domain/event';
 import Hall from '../../../domain/hall';
-import makeHallDummy from './make-hall-dummy';
+import makeDummyHall from './make-dummy-hall';
 
 export default function makeDummyEvent(
   id: string = 'example event id',
   name: string = 'example event name',
-  hall: Hall = makeHallDummy('example hall id'),
+  hall: Hall = makeDummyHall('example hall id'),
   startsAt: Date = new Date('2020'),
   endsAt: Date = new Date('2021'),
 

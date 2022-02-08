@@ -2,7 +2,7 @@
 import Event from '../../../domain/event';
 import { StoredEventData } from '../../../infrastracture/storage-vendors/event-storage-vendor';
 import deconstructEvent from '../../use-case-utils/deconstructors/deconstruct-event';
-import makeHallDummy from '../../use-case-utils/dummies/make-hall-dummy';
+import makeDummyHall from '../../use-case-utils/dummies/make-dummy-hall';
 import reconstructEvent from '../../use-case-utils/reconstructors/reconstruct-event';
 import tryExecutingStorageQuery from '../../use-case-utils/try-catch-shorthands/try-executing-storage-query';
 import tryFindingEntityData from '../../use-case-utils/try-catch-shorthands/try-finding-entity-data';
@@ -28,7 +28,7 @@ export default class EventActionFactory
       return <Event[]> eventDataSet.map((eventData) => tryReconstructing(
         reconstructEvent,
         eventData,
-        makeHallDummy(eventData.hallId),
+        makeDummyHall(eventData.hallId),
       ));
     };
   }
@@ -47,7 +47,7 @@ export default class EventActionFactory
       return <Event[]> eventDataSet.map((eventData) => tryReconstructing(
         reconstructEvent,
         eventData,
-        makeHallDummy(eventData.hallId),
+        makeDummyHall(eventData.hallId),
       ));
     };
   }
@@ -66,7 +66,7 @@ export default class EventActionFactory
       return <Event> eventDataSet.map((eventData) => tryReconstructing(
         reconstructEvent,
         eventData,
-        makeHallDummy(eventData.hallId),
+        makeDummyHall(eventData.hallId),
       ))[0];
     };
   }
@@ -85,7 +85,7 @@ export default class EventActionFactory
       return <Event> eventDataSet.map((eventData) => tryReconstructing(
         reconstructEvent,
         eventData,
-        makeHallDummy(eventData.hallId),
+        makeDummyHall(eventData.hallId),
       ))[0];
     };
   }
