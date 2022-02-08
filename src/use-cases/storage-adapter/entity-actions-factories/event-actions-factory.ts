@@ -28,7 +28,7 @@ export default class EventActionFactory
       return <Event[]> eventDataSet.map((eventData) => tryReconstructing(
         reconstructEvent,
         eventData,
-        makeDummyHall(eventData.hallId),
+        makeDummyHall({ id: eventData.hallId }),
       ));
     };
   }
@@ -47,7 +47,7 @@ export default class EventActionFactory
       return <Event[]> eventDataSet.map((eventData) => tryReconstructing(
         reconstructEvent,
         eventData,
-        makeDummyHall(eventData.hallId),
+        makeDummyHall({ id: eventData.hallId }),
       ));
     };
   }
@@ -66,7 +66,7 @@ export default class EventActionFactory
       return <Event> eventDataSet.map((eventData) => tryReconstructing(
         reconstructEvent,
         eventData,
-        makeDummyHall(eventData.hallId),
+        makeDummyHall({ id: eventData.hallId }),
       ))[0];
     };
   }
@@ -85,7 +85,7 @@ export default class EventActionFactory
       return <Event> eventDataSet.map((eventData) => tryReconstructing(
         reconstructEvent,
         eventData,
-        makeDummyHall(eventData.hallId),
+        makeDummyHall({ id: eventData.hallId }),
       ))[0];
     };
   }

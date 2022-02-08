@@ -24,7 +24,7 @@ export default class TicketActionsFactory
       })(storageVendor.findTicket.bind(storageVendor), params);
       return <Ticket[]> ticketDataSet.map((ticketData) => reconstructTicket(
         ticketData,
-        makeDummyEvent(ticketData.eventId),
+        makeDummyEvent({ id: ticketData.eventId }),
       ));
     };
   }
@@ -42,7 +42,7 @@ export default class TicketActionsFactory
       })(storageVendor.findTicket.bind(storageVendor), params);
       return <Ticket[]> ticketDataSet.map((ticketData) => reconstructTicket(
         ticketData,
-        makeDummyEvent(ticketData.eventId),
+        makeDummyEvent({ id: ticketData.eventId }),
       ));
     };
   }
@@ -60,7 +60,7 @@ export default class TicketActionsFactory
       })(storageVendor.findTicket.bind(storageVendor), { id: ticketId });
       return <Ticket> ticketDataSet.map((ticketData) => reconstructTicket(
         ticketData,
-        makeDummyEvent(ticketData.eventId),
+        makeDummyEvent({ id: ticketData.eventId }),
       ))[0];
     };
   }
@@ -78,7 +78,7 @@ export default class TicketActionsFactory
       })(storageVendor.findTicket.bind(storageVendor), { id: ticketId });
       return <Ticket> ticketDataSet.map((ticketData) => reconstructTicket(
         ticketData,
-        makeDummyEvent(ticketData.eventId),
+        makeDummyEvent({ id: ticketData.eventId }),
       ))[0];
     };
   }

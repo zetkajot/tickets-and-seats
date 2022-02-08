@@ -7,7 +7,7 @@ describe('Ticket Actions Concrete Factory test suite', () => {
     TicketActionsFactory,
     {
       id: 'example ticket id',
-      event: makeDummyEvent('example event id'),
+      event: makeDummyEvent(),
       seatNo: 1,
     },
     {

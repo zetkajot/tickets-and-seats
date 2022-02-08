@@ -1,7 +1,7 @@
 import testEntityActionsFactory from './test-entity-actions-factory';
 import EventActionFactory from './event-actions-factory';
 import Event from '../../../domain/event';
-import makeHallDummy from '../../use-case-utils/dummies/make-hall-dummy';
+import makeHallDummy from '../../use-case-utils/dummies/make-dummy-hall';
 
 describe('Event Action Concrete Factory test suite', () => {
   testEntityActionsFactory(
@@ -11,7 +11,7 @@ describe('Event Action Concrete Factory test suite', () => {
       'example event',
       new Date('2021'),
       new Date('2022'),
-      makeHallDummy('example hall id'),
+      makeHallDummy(),
     ),
     {
       id: 'example event id',
