@@ -39,5 +39,10 @@ describe('Find Query factory test suite', () => {
 
       expect(query).to.include('WHERE param1 = \'value\' AND param2 = \'value\';');
     });
+    it('Non string values are not single-quoted', () => {
+      const query = makeFindQuery('some_table', { param1: 13, param2: true });
+
+      expect(query).to.include('WHERE param1 = 13 AND param2 = true;');
+    });
   });
 });
