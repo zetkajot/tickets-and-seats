@@ -1,6 +1,6 @@
 import { ResultSet } from './result-set';
 
-type HallResult = {
+export type HallResult = {
   id: string,
   name: string,
   layout: string,
