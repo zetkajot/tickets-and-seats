@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 export default class ConfigSingleton {
   private static instance: ConfigSingleton;
 
@@ -11,9 +13,9 @@ export default class ConfigSingleton {
   private static initializeConfig() {
     ConfigSingleton.instance = new ConfigSingleton(
       {
-        hostname: process.env.MARIADB_HOST as string,
+        host: process.env.MARIADB_HOST as string,
         port: +(process.env.MARIADB_PORT as string),
-        username: process.env.MARIADB_USER as string,
+        user: process.env.MARIADB_USER as string,
         password: process.env.MARIADB_PASS as string,
         database: process.env.MARIADB_DB as string,
       },
@@ -26,9 +28,9 @@ export default class ConfigSingleton {
 }
 
 type MariaDBConfig = {
-  hostname: string,
+  host: string,
   port: number,
-  username: string,
+  user: string,
   password: string,
   database: string,
 };
