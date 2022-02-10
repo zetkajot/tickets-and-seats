@@ -7,7 +7,7 @@ export type EventResult = {
   startsat: number,
   endsat: number,
   isopen: boolean;
-  reservedseats: string;
+  reservedseats: number[];
 };
 
 export type EventResultSet = ResultSet<EventResult>;

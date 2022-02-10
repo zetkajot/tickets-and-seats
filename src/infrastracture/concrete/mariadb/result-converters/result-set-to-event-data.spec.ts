@@ -10,7 +10,7 @@ const exampleEventResultSet: EventResultSet = [
     startsat: new Date('2022').getTime(),
     hallid: 'hall-id',
     isopen: false,
-    reservedseats: '[1, 3, 5]',
+    reservedseats: [1, 3, 5],
   },
 ];
 
@@ -22,11 +22,6 @@ describe('resultSetToEventData test suite', () => {
       expect(eventData[0].startsAt).to.deep.equal(new Date('2022'));
       expect(eventData[0].endsAt).to.deep.equal(new Date('2023'));
     });
-    it('Converts \'reservedSeats\' to array', () => {
-      const eventData = resultSetToEventData(exampleEventResultSet);
-
-      expect(eventData[0].reservedSeats).to.deep.equal([1, 3, 5]);
-    });
     it('Does not change the value of other fields', () => {
       const eventData = resultSetToEventData(exampleEventResultSet);
 
@@ -34,6 +29,7 @@ describe('resultSetToEventData test suite', () => {
       expect(eventData[0].name).to.equal('event name');
       expect(eventData[0].hallId).to.equal('hall-id');
       expect(eventData[0].isOpen).to.equal(false);
+      expect(eventData[0].reservedSeats).to.deep.equal([1, 3, 5]);
     });
   });
 });

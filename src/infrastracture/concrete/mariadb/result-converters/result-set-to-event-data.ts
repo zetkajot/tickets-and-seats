@@ -10,7 +10,7 @@ export default function resultSetToEventData(resultSet: EventResultSet): StoredE
     hallId: row.hallid,
     startsAt: new Date(row.startsat),
     endsAt: new Date(row.endsat),
-    isOpen: row.isopen,
-    reservedSeats: JSON.parse(row.reservedseats),
+    isOpen: !!row.isopen,
+    reservedSeats: row.reservedseats as any,
   }));
 }
