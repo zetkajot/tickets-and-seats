@@ -6,7 +6,8 @@
   "license": "ISC",
   "description": "Automaticaly generated description",
   "scripts": {
-    "test": "mocha -r ts-node/register --full-trace src/**/*.spec.ts",
+    "test": "mocha -r ts-node/register --full-trace --exclude src/**/*.component.spec.ts src/**/*.spec.ts",
+    "component-test": "mocha -r ts-node/register --full-trace src/**/*.component.spec.ts",
     "start": "node dist/main.js",
     "build": "tsc"
   },
@@ -34,6 +35,7 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "express": "^4.17.2"
+    "express": "^4.17.2",
+    "mariadb": "^2.5.5"
   }
 }
