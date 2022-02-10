@@ -12,15 +12,8 @@ const exampleRequest = {
 
 describe('makeControllerRequest test suite', () => {
   describe('When provided with express request', () => {
-    it('Converts \'path\' to \'action\' field in ControllerRequest', () => {
-      const controllerRequest = makeControllerRequest(exampleRequest);
-
-      expect(controllerRequest)
-        .to.have.property('action')
-        .which.deep.equals('action-name');
-    });
     it('Converts \'query\' to \'args\' in ControllerRequest', () => {
-      const controllerRequest = makeControllerRequest(exampleRequest);
+      const controllerRequest = makeControllerRequest(exampleRequest, 'some action');
 
       expect(controllerRequest)
         .to.have.property('args')

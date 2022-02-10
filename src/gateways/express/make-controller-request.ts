@@ -1,11 +1,13 @@
 import { Request } from 'express';
 import { ControllerRequest } from '../../controllers/types/controller-request';
 
-export default function makeControllerRequest(expressRequest: Request): ControllerRequest {
-  const action = expressRequest.path.replace('/', '');
+export default function makeControllerRequest(
+  expressRequest: Request,
+  actionName: string,
+): ControllerRequest {
   const args = getArgsFromQuery(expressRequest.query);
   return {
-    action,
+    action: actionName,
     args,
   };
 }
