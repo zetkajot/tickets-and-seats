@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 import basicSchema from './controllers/schemas/basic-schema';
 import Controller from './controllers/controller';
 import makeApp from './gateways/express/make-app';
