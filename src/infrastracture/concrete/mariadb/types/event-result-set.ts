@@ -1,6 +1,6 @@
 import { ResultSet } from './result-set';
 
-type EventResult = {
+export type EventResult = {
   id: string,
   name: string,
   hallid: string,
