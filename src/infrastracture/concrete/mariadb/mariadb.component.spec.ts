@@ -6,13 +6,9 @@ import { StoredHallData } from '../../storage-vendors/hall-storage-vendor';
 import { StoredTicketData } from '../../storage-vendors/ticket-storage-vendor';
 import makeMariaDBStorageVendor from './make-maria-db-storage-vendor';
 import MariaDBStorageVendor from './mariadb-storage-vendor';
+import ConfigSingleton from '../../../utils/config-singleton';
 
-const connectionPool = createPool({
-  user: 'test',
-  password: 'test',
-  database: 'test',
-  host: '127.0.0.1',
-});
+const connectionPool = createPool(ConfigSingleton.getConfig().mariadbConfig);
 
 describe('MariaDB SV Component test suite', () => {
   let vendor: MariaDBStorageVendor;
