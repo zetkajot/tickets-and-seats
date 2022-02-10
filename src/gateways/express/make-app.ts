@@ -1,18 +1,15 @@
 import express from 'express';
 import Controller from '../../controllers/controller';
-import makeControllerRequest from './make-controller-request';
-import setExpressResponse from './set-express-response';
+import makeEventRouter from './make-event-router';
+import makeHallRouter from './make-hall-router';
+import makeTicketRouter from './make-ticket-router';
 
-export default function makeApp(controller: Controller, actionPaths: string[]) {
+export default function makeApp(controller: Controller) {
   const app = express();
-  actionPaths.forEach((path) => {
-    console.log(`Adding GET path for /${path}`);
-    app.get(`/${path}`, async (req, res) => {
-      const controllerRequest = makeControllerRequest(req);
-      const controllerResponse = await controller.handleRequest(controllerRequest);
-      setExpressResponse(res, controllerResponse);
-    });
-  });
+
+  app.use('/hall', makeHallRouter(controller));
+  app.use('/event', makeEventRouter(controller));
+  app.use('/ticket', makeTicketRouter(controller));
 
   return app;
 }
