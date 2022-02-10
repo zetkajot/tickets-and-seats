@@ -18,6 +18,13 @@ function makeFields(parameters: { [k: string]: any }): string {
 
 function makeValues(parameters: { [k: string]: any }): string {
   return Object.values(parameters)
-    .map((value) => (typeof value === 'string' ? `'${value}'` : `${value}`))
+    .map((value) => convertValue(value))
     .join(', ');
+}
+
+function convertValue(value: any): string {
+  if (typeof value.getMonth === 'function') return convertValue(value.getTime());
+  if (typeof value === 'string') return `'${value}'`;
+  if (Array.isArray(value)) return convertValue(JSON.stringify(value));
+  return `${value}`;
 }

@@ -56,5 +56,14 @@ describe('Save Query Factory test suite', () => {
 
       expect(query).to.include('VALUES (1, \'2\', 2)');
     });
+    it('Dates are converted to numbers (epoch time)', () => {
+      const params = {
+        x: new Date('2022'),
+      };
+
+      const query = makeSaveQuery('xd', params);
+
+      expect(query).to.include(`VALUES (${new Date('2022').getTime()})`);
+    });
   });
 });
