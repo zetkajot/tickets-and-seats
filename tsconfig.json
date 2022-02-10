@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "module": "NodeNext",
+    "module": "CommonJS",
     "outDir": "./dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "moduleResolution": "Node12",
+    "moduleResolution": "Node",
   },
   "include": ["src/**/*.ts"],
   "exclude": ["**/*.spec.ts"]
