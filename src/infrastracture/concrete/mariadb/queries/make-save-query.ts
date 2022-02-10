@@ -7,8 +7,9 @@ export default function makeSaveQuery(
   }
   const fields = makeFields(parameters);
   const values = makeValues(parameters);
+  const updateClause = makeUpdateClause(parameters);
 
-  return `INSERT INTO ${tableName} (${fields}) VALUES (${values});`;
+  return `INSERT INTO ${tableName} (${fields}) VALUES (${values}) ON DUPLICATE KEY UPDATE ${updateClause};`;
 }
 
 function makeFields(parameters: { [k: string]: any }): string {
@@ -27,4 +28,10 @@ function convertValue(value: any): string {
   if (typeof value === 'string') return `'${value}'`;
   if (Array.isArray(value)) return convertValue(JSON.stringify(value));
   return `${value}`;
+}
+
+function makeUpdateClause(parameters: { [k: string]: any }): string {
+  return Object.keys(parameters)
+    .map((key) => `${key} = VALUES(${key})`)
+    .join(', ');
 }
