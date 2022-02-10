@@ -1,6 +1,6 @@
 import { ResultSet } from './result-set';
 
-type TicketResult = {
+export type TicketResult = {
   id: string,
   eventid: string,
   seatno: number,
