@@ -11,7 +11,7 @@ import { ResultSetConverters } from './types/result-set-converters';
 
 export default class MariaDBStorageVendor implements CombinedStorageVendor {
   constructor(
-    private connectionPool: Pool,
+    public readonly connectionPool: Pool,
     private queries: QueryFactories,
     private converters: ResultSetConverters,
   ) {}
