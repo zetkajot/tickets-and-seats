@@ -5,15 +5,19 @@ import DiscrepancyError from '../errors/discrapency-error';
 import InternalError, { InternalErrorSubtype } from '../errors/internal-error';
 import InvalidDataError, { InvalidDataErrorSubtype } from '../errors/invalid-data-error';
 
-export default function tryEntityInteraction(options: {
-  onDomainError: 'DiscrepancyError' | 'InvalidDataError'
-} = {
+type EntityInteractionOptions = {
   onDomainError: 'InvalidDataError',
+  errorSubtype: InvalidDataErrorSubtype,
+} | { onDomainError: 'DiscrepancyError' };
+
+export default function tryEntityInteraction(options: EntityInteractionOptions = {
+  onDomainError: 'InvalidDataError',
+  errorSubtype: InvalidDataErrorSubtype.NOT_SPECIFIED,
 }) {
   if (options.onDomainError === 'DiscrepancyError') {
     return throwingDiscrepancyError;
   }
-  return throwingInvalidDataError;
+  return throwingInvalidDataError.bind(null, options.errorSubtype);
 }
 
 function throwingDiscrepancyError<T extends (
@@ -41,6 +45,7 @@ function throwingDiscrepancyError<T extends (
 
 function throwingInvalidDataError<T extends (
   ...args: any[])=> any>(
+  errorSubtype: InvalidDataErrorSubtype,
   interaction: T,
   ...interactionArgs: Parameters<T>
 ): ReturnType<T> {
@@ -49,7 +54,7 @@ function throwingInvalidDataError<T extends (
     DomainError,
     () => ErrorFactory.getInstance().makeError(
       InvalidDataError,
-      InvalidDataErrorSubtype.NOT_SPECIFIED,
+      errorSubtype,
     ),
   );
   context.addRethrow(
