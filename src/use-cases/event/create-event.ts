@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import Event from '../../domain/event';
 import UseCase from '../use-case';
+import { InvalidDataErrorSubtype } from '../use-case-utils/errors/invalid-data-error';
 import tryInstantiating from '../use-case-utils/try-catch-shorthands/try-instantiating';
 
 type Input = {
@@ -20,7 +21,9 @@ export default class CreateEvent extends UseCase<Input, Output> {
     eventName, hallId, eventStartingDate, eventEndingDate,
   }: Input): Promise<Output> {
     const hall = await this.adaptedDataVendor.findUniqueHall(hallId);
-    const event = <Event> tryInstantiating(
+    const event = <Event> tryInstantiating({
+      possibleError: InvalidDataErrorSubtype.INVALID_EVENT_DATA,
+    })(
       Event,
       randomUUID(),
       eventName,

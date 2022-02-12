@@ -49,7 +49,7 @@ describe('Open Event Use Case test suite', () => {
         return expect(useCase.execute({ eventId: 'nonexistent event id' }))
           .to.eventually.be.rejectedWith(InvalidDataError)
           .with.property('subtype')
-          .which.equals(InvalidDataErrorSubtype.EVENT_CLOSED);
+          .which.equals(InvalidDataErrorSubtype.EVENT_OPENED);
       });
     });
     describe('When event is closed for reservations', () => {

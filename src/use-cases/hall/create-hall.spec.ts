@@ -46,7 +46,7 @@ describe('Create Hall Use Case test suite', () => {
       return expect(useCase.execute({ hallName: 'hall x', seatLayout: invalidLayout }))
         .to.eventually.be.rejectedWith(InvalidDataError)
         .with.property('subtype')
-        .which.equals(InvalidDataErrorSubtype.INVALID_SEAT_LAYOUT);
+        .which.equals(InvalidDataErrorSubtype.INVALID_HALL_DATA);
     });
   });
   describe('When provided with valid hall data', () => {
