@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import CombinedStorageVendor from '../../infrastracture/storage-vendors/combined-storage-vendor';
 import { StoredEventData } from '../../infrastracture/storage-vendors/event-storage-vendor';
 import { StoredHallData } from '../../infrastracture/storage-vendors/hall-storage-vendor';
-import InvalidDataError from '../use-case-utils/errors/invalid-data-error';
+import InvalidDataError, { InvalidDataErrorSubtype } from '../use-case-utils/errors/invalid-data-error';
 import GetSeatsInfo from './get-seats-info';
 
 const validEventData = {
@@ -36,7 +36,9 @@ describe('Get Seats Info Use Case test suite', () => {
       const useCase = new GetSeatsInfo(dataVendor);
 
       expect(useCase.execute({ eventId: 'nonexistent event id' }))
-        .to.eventually.be.rejectedWith(InvalidDataError);
+        .to.eventually.be.rejectedWith(InvalidDataError)
+        .with.property('subtype')
+        .which.equals(InvalidDataErrorSubtype.ENTITY_NOT_FOUND);
     });
   });
   describe('When provided with id of existing event', () => {

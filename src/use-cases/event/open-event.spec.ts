@@ -3,7 +3,7 @@ import Sinon from 'sinon';
 import CombinedStorageVendor from '../../infrastracture/storage-vendors/combined-storage-vendor';
 import { StoredEventData } from '../../infrastracture/storage-vendors/event-storage-vendor';
 import { StoredHallData } from '../../infrastracture/storage-vendors/hall-storage-vendor';
-import InvalidDataError from '../use-case-utils/errors/invalid-data-error';
+import InvalidDataError, { InvalidDataErrorSubtype } from '../use-case-utils/errors/invalid-data-error';
 import OpenEvent from './open-event';
 
 const closedEventData: StoredEventData = {
@@ -32,7 +32,9 @@ describe('Open Event Use Case test suite', () => {
       const useCase = new OpenEvent(dataVendor);
 
       return expect(useCase.execute({ eventId: 'nonexistent event id' }))
-        .to.eventually.be.rejectedWith(InvalidDataError);
+        .to.eventually.be.rejectedWith(InvalidDataError)
+        .with.property('subtype')
+        .which.equals(InvalidDataErrorSubtype.ENTITY_NOT_FOUND);
     });
   });
   describe('When provided with id of existing event', () => {
@@ -45,7 +47,9 @@ describe('Open Event Use Case test suite', () => {
         const useCase = new OpenEvent(dataVendor);
 
         return expect(useCase.execute({ eventId: 'nonexistent event id' }))
-          .to.eventually.be.rejectedWith(InvalidDataError);
+          .to.eventually.be.rejectedWith(InvalidDataError)
+          .with.property('subtype')
+          .which.equals(InvalidDataErrorSubtype.EVENT_OPENED);
       });
     });
     describe('When event is closed for reservations', () => {

@@ -25,7 +25,7 @@ function makeUnknownInternalError(error: Error) {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function makeDiscrepancyError(error: Error) {
   return ErrorFactory.getInstance()
-    .makeError(DiscrepancyError);
+    .makeError(DiscrepancyError, error);
 }
 
 export default reconstructingFromStorageData;

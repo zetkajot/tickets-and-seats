@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import Sinon from 'sinon';
 import CombinedStorageVendor from '../../infrastracture/storage-vendors/combined-storage-vendor';
-import InvalidDataError from '../use-case-utils/errors/invalid-data-error';
+import InvalidDataError, { InvalidDataErrorSubtype } from '../use-case-utils/errors/invalid-data-error';
 import FindHallById from './find-hall-by-id';
 
 describe('FindHallById Use Case test suite', () => {
@@ -15,7 +15,9 @@ describe('FindHallById Use Case test suite', () => {
 
     return expect(tryFinding())
       .to.eventually.be.rejected
-      .and.to.be.an.instanceOf(InvalidDataError);
+      .and.to.be.an.instanceOf(InvalidDataError)
+      .with.property('subtype')
+      .which.equals(InvalidDataErrorSubtype.ENTITY_NOT_FOUND);
   });
   it('When succeedes, returns output data matching specified pattern', async () => {
     const findHallById = new FindHallById({

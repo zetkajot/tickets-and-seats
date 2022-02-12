@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import Sinon from 'sinon';
 import CombinedStorageVendor from '../../infrastracture/storage-vendors/combined-storage-vendor';
-import InvalidDataError from '../use-case-utils/errors/invalid-data-error';
+import InvalidDataError, { InvalidDataErrorSubtype } from '../use-case-utils/errors/invalid-data-error';
 import IssueTicket from './issue-ticket';
 
 const validEventData = Object.freeze({
@@ -45,7 +45,9 @@ describe('Issue Ticket Use Case test suite', () => {
 
     return expect(tryIssuing())
       .to.eventually.be.rejected
-      .and.to.be.an.instanceOf(InvalidDataError);
+      .and.to.be.an.instanceOf(InvalidDataError)
+      .with.property('subtype')
+      .which.equals(InvalidDataErrorSubtype.ENTITY_NOT_FOUND);
   });
   it('Throws InvalidDataError when event is closed for reservations', () => {
     dataVendor.findEvent = async () => [{
@@ -58,7 +60,9 @@ describe('Issue Ticket Use Case test suite', () => {
 
     return expect(tryIssuing())
       .to.eventually.be.rejected
-      .and.to.be.an.instanceOf(InvalidDataError);
+      .and.to.be.an.instanceOf(InvalidDataError)
+      .with.property('subtype')
+      .which.equals(InvalidDataErrorSubtype.EVENT_CLOSED);
   });
   it('Throws InvalidDataError when provided seat is taken', () => {
     dataVendor.findEvent = async () => [{
@@ -71,7 +75,9 @@ describe('Issue Ticket Use Case test suite', () => {
 
     return expect(tryIssuing())
       .to.eventually.be.rejected
-      .and.to.be.an.instanceOf(InvalidDataError);
+      .and.to.be.an.instanceOf(InvalidDataError)
+      .with.property('subtype')
+      .which.equals(InvalidDataErrorSubtype.SEAT_TAKEN);
   });
   it('Throws InvalidDataError if seat with given number does not exist', () => {
     const useCase = new IssueTicket(dataVendor);
@@ -80,7 +86,9 @@ describe('Issue Ticket Use Case test suite', () => {
 
     return expect(tryIssuing())
       .to.eventually.be.rejected
-      .and.to.be.an.instanceOf(InvalidDataError);
+      .and.to.be.an.instanceOf(InvalidDataError)
+      .with.property('subtype')
+      .which.equals(InvalidDataErrorSubtype.SEAT_NOT_FOUND);
   });
   describe('When succeeds', () => {
     it('Saves issued ticket in storage', async () => {
