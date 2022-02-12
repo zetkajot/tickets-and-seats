@@ -19,7 +19,7 @@ describe('Delete Hall Use Case test suite', () => {
       const sv = { findHall: async () => [] } as unknown as CombinedStorageVendor;
       const deleteHall = new DeleteHall(sv);
 
-      expect(deleteHall.execute({ hallId: 'nonexistent-hall-id' }))
+      return expect(deleteHall.execute({ hallId: 'nonexistent-hall-id' }))
         .to.eventually.be.rejectedWith(InvalidDataError)
         .with.property('subtype')
         .which.equals(InvalidDataErrorSubtype.ENTITY_NOT_FOUND);

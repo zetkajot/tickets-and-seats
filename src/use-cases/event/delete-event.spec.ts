@@ -21,7 +21,7 @@ describe('Delete Event Use Case test suite', () => {
       const storageVendor = { findEvent: async () => [] } as unknown as CombinedStorageVendor;
       const deleteEvent = new DeleteEvent(storageVendor);
 
-      expect(deleteEvent.execute({ eventId: 'non-existent-id' }))
+      return expect(deleteEvent.execute({ eventId: 'non-existent-id' }))
         .to.eventually.be.rejectedWith(InvalidDataError)
         .with.property('subtype')
         .which.equals(InvalidDataErrorSubtype.ENTITY_NOT_FOUND);
