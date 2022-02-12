@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import Sinon from 'sinon';
 import CombinedStorageVendor from '../../infrastracture/storage-vendors/combined-storage-vendor';
 import { StoredEventData } from '../../infrastracture/storage-vendors/event-storage-vendor';
-import InvalidDataError from '../use-case-utils/errors/invalid-data-error';
+import InvalidDataError, { InvalidDataErrorSubtype } from '../use-case-utils/errors/invalid-data-error';
 import CloseEvent from './close-event';
 
 const closedEventData: StoredEventData = {
@@ -25,7 +25,10 @@ describe('Close Event Use Case test suite', () => {
 
       const tryExecuting = () => useCase.execute({ eventId: 'nonexistent event id' });
 
-      return expect(tryExecuting()).to.eventually.be.rejectedWith(InvalidDataError);
+      return expect(tryExecuting())
+        .to.eventually.be.rejectedWith(InvalidDataError)
+        .with.property('subtype')
+        .which.equals(InvalidDataErrorSubtype.ENTITY_NOT_FOUND);
     });
   });
   describe('When provided with id of existing event', () => {
@@ -68,7 +71,10 @@ describe('Close Event Use Case test suite', () => {
 
         const tryExecuting = () => useCase.execute({ eventId: 'closed event id' });
 
-        return expect(tryExecuting()).to.eventually.be.rejectedWith(InvalidDataError);
+        return expect(tryExecuting())
+          .to.eventually.be.rejectedWith(InvalidDataError)
+          .with.property('subtype')
+          .which.equals(InvalidDataErrorSubtype.EVENT_CLOSED);
       });
     });
   });

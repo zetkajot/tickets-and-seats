@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import CombinedStorageVendor from '../../infrastracture/storage-vendors/combined-storage-vendor';
-import InvalidDataError from '../use-case-utils/errors/invalid-data-error';
+import InvalidDataError, { InvalidDataErrorSubtype } from '../use-case-utils/errors/invalid-data-error';
 import CreateEvent from './create-event';
 
 const validHallData = Object.freeze({
@@ -34,7 +34,9 @@ describe('Create Event Use Case test suite', () => {
 
       return expect(tryCreatingEvent())
         .to.eventually.be.rejected
-        .and.to.be.an.instanceOf(InvalidDataError);
+        .and.to.be.an.instanceOf(InvalidDataError)
+        .with.property('subtype')
+        .which.equals(InvalidDataErrorSubtype.ENTITY_NOT_FOUND);
     });
   });
   describe('When provided with valid hallId', () => {
@@ -50,7 +52,9 @@ describe('Create Event Use Case test suite', () => {
         });
         return expect(tryCreatingEvent())
           .to.eventually.be.rejected
-          .and.to.be.an.instanceOf(InvalidDataError);
+          .and.to.be.an.instanceOf(InvalidDataError)
+          .with.property('subtype')
+          .which.equals(InvalidDataErrorSubtype.INVALID_EVENT_DATA);
       });
     });
     describe('and with valid event data', () => {

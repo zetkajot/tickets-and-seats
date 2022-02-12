@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import Sinon from 'sinon';
 import CombinedStorageVendor from '../../infrastracture/storage-vendors/combined-storage-vendor';
-import InvalidDataError from '../use-case-utils/errors/invalid-data-error';
+import InvalidDataError, { InvalidDataErrorSubtype } from '../use-case-utils/errors/invalid-data-error';
 import CreateHall from './create-hall';
 
 const validLayout = [
@@ -44,7 +44,9 @@ describe('Create Hall Use Case test suite', () => {
       const useCase = new CreateHall({} as CombinedStorageVendor);
 
       return expect(useCase.execute({ hallName: 'hall x', seatLayout: invalidLayout }))
-        .to.eventually.be.rejectedWith(InvalidDataError);
+        .to.eventually.be.rejectedWith(InvalidDataError)
+        .with.property('subtype')
+        .which.equals(InvalidDataErrorSubtype.INVALID_SEAT_LAYOUT);
     });
   });
   describe('When provided with valid hall data', () => {
