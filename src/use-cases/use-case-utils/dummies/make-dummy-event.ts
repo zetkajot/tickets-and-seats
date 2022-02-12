@@ -40,7 +40,7 @@ export default function makeDummyEvent(input = defaultDummyEventFactoryInput) {
     event.openForReservations();
     (reservedSeats as number[]).forEach((seatNo) => {
       event.reserveSeat(seatNo);
-      (hall as Hall).layout.addSeat(seatNo, [0, 0]);
+      if (!(hall as Hall).hasSeat(seatNo)) (hall as Hall).layout.addSeat(seatNo, [0, 0]);
     });
     event.closeForReservations();
   }
