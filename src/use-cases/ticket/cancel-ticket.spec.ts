@@ -1,6 +1,5 @@
 import { expect } from 'chai';
 import Sinon from 'sinon';
-import ErrorFactory from '../../error/error-factory';
 import CombinedStorageVendor from '../../infrastracture/storage-vendors/combined-storage-vendor';
 import { StoredTicketData } from '../../infrastracture/storage-vendors/ticket-storage-vendor';
 import deconstructEvent from '../use-case-utils/deconstructors/deconstruct-event';
@@ -29,9 +28,6 @@ const dummyEvent = makeDummyEvent({
 });
 
 describe('Cancel Ticket Use Case test suite', () => {
-  before(() => {
-    ErrorFactory.setDefaultLogger();
-  });
   it('Looks for ticket with given id via storage vendor', async () => {
     const sv = {
       findTicket: Sinon.spy(async () => [dummyTicketData]),
