@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import Sinon from 'sinon';
 import CombinedStorageVendor from '../../infrastracture/storage-vendors/combined-storage-vendor';
 import { StoredEventData } from '../../infrastracture/storage-vendors/event-storage-vendor';
 import InvalidDataError, { InvalidDataErrorSubtype } from '../use-case-utils/errors/invalid-data-error';
@@ -27,6 +28,18 @@ describe('Delete Event Use Case test suite', () => {
     });
   });
   describe('When provided with id of existing event', () => {
+    it('Deletes event via storage vendor', async () => {
+      const storageVendor = {
+        findEvent: async () => [dummyEventData],
+        deleteEvent: Sinon.spy(async () => undefined),
+      } as unknown as CombinedStorageVendor;
+      const deleteEvent = new DeleteEvent(storageVendor);
+
+      await deleteEvent.execute({ eventId: 'existing-event-id' });
+
+      expect(storageVendor.deleteEvent)
+        .to.have.been.calledOnceWithExactly('some-data');
+    });
     it('Returns info about deleted event', async () => {
       const storageVendor = {
         findEvent: async () => [dummyEventData],
