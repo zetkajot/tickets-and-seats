@@ -7,7 +7,7 @@ const findRelatedEntity: RehtrowingTemplate = {
   rehthrows: [
     {
       matchingError: InvalidDataError,
-      rehtrowingFn: () => ErrorFactory.getInstance().makeError(DiscrepancyError),
+      rehtrowingFn: (error) => ErrorFactory.getInstance().makeError(DiscrepancyError, error),
     },
   ],
 };

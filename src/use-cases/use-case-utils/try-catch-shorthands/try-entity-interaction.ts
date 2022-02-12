@@ -28,8 +28,9 @@ function throwingDiscrepancyError<T extends (
   const context = new Rethrower<ReturnType<T>, T>(interaction);
   context.addRethrow(
     DomainError,
-    () => ErrorFactory.getInstance().makeError(
+    (error) => ErrorFactory.getInstance().makeError(
       DiscrepancyError,
+      error,
     ),
   );
   context.addRethrow(

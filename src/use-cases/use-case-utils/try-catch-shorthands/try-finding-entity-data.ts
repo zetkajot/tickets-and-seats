@@ -62,11 +62,11 @@ async function tryFindingEntityDataWithOptions<
   const foundData = <EntityData[]> await tryExecutingStorageQuery(finderFn, ...finderAgs);
 
   if (foundData.length > 1 && options.unique) {
-    throw ErrorFactory.getInstance().makeError(DiscrepancyError);
+    throw ErrorFactory.getInstance().makeError(DiscrepancyError, new Error('Uniqueness violated!'));
   }
   if (foundData.length === 0 && !options.allowEmpty) {
     if (options.related) {
-      throw ErrorFactory.getInstance().makeError(DiscrepancyError);
+      throw ErrorFactory.getInstance().makeError(DiscrepancyError, new Error('Empty result not allowed!'));
     } else {
       throw ErrorFactory.getInstance()
         .makeError(InvalidDataError, InvalidDataErrorSubtype.ENTITY_NOT_FOUND);
