@@ -10,7 +10,7 @@ const seatConversion: RehtrowingTemplate = {
       matchingError: DomainError,
       rehtrowingFn: () => ErrorFactory
         .getInstance()
-        .makeError(InvalidDataError, InvalidDataErrorSubtype.INVALID_SEAT_LAYOUT),
+        .makeError(InvalidDataError, InvalidDataErrorSubtype.INVALID_HALL_DATA),
     },
     {
       matchingError: Error,
