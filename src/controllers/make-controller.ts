@@ -1,19 +1,10 @@
 import Gateway from '../gateways/types/gateway';
 import UseCase from '../use-cases/use-case';
 import { RequestConverter } from './request-converters/make-input-converter';
+import { Actions } from './types/actions';
+import { Controller } from './types/controller';
 import { ControllerRequest } from './types/controller-request';
 import { ControllerResponse } from './types/controller-response';
-
-export type Actions = {
-  [k: string]: {
-    converter: RequestConverter,
-    useCase: UseCase<any, any>,
-  };
-};
-
-type Controller<T extends { [k: string]: any }> = {
-  [k in `handle${Capitalize<keyof T & string>}`]: (req: ControllerRequest) => Promise<ControllerResponse>;
-};
 
 export default function makeController(
   actions: Actions,

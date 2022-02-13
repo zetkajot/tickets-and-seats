@@ -3,7 +3,8 @@ import { expect } from 'chai';
 import Sinon, { SinonSpy } from 'sinon';
 import Gateway from '../gateways/types/gateway';
 import UseCase from '../use-cases/use-case';
-import makeController, { Actions } from './new-controller';
+import { Actions } from './types/actions';
+import makeController from './make-controller';
 import { RequestConverter } from './request-converters/make-input-converter';
 import { ControllerRequest } from './types/controller-request';
 
