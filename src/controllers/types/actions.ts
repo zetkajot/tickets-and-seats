@@ -1,9 +1,9 @@
+import UseCase from '../../use-cases/use-case';
 import { RequestConverter } from '../request-converters/make-input-converter';
-import { UseCaseConstructor } from './use-case-constructor';
 
-export type ActionSchema = {
+export type Actions = {
   [k: string]: {
     converter: RequestConverter;
-    UseCase: UseCaseConstructor<any, any>;
+    useCase: UseCase<any, any>;
   };
 };

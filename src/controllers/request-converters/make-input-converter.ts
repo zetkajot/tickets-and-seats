@@ -12,9 +12,11 @@ type ValueConverter = (value: string) => any;
 
 export type ConverterFactorySettings = (ComplexConverterFactorySetting | string)[];
 
-type Converter = (request: ControllerRequest) => any;
+export type RequestConverter = (request: ControllerRequest) => any;
 
-export default function makeInputConverter(...settings: ConverterFactorySettings): Converter {
+export default function makeInputConverter(
+  ...settings: ConverterFactorySettings
+): RequestConverter {
   const settingsMap = getSettingsMap(settings);
   return function inputConverter(request: ControllerRequest) {
     const { args } = request;
