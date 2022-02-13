@@ -1,10 +1,9 @@
-import UseCase from '../../use-cases/use-case';
-import { ControllerRequest } from './controller-request';
-
-export type UseCaseConstructor = { new(...args: any): UseCase<any, any> };
+import { RequestConverter } from '../request-converters/make-input-converter';
+import { UseCaseConstructor } from './use-case-constructor';
 
 export type ActionSchema = {
-  actionName: string,
-  targetUseCase: UseCaseConstructor,
-  convertRequestToInput: <UseCaseInput>(request: ControllerRequest) => UseCaseInput,
-}[];
+  [k: string]: {
+    converter: RequestConverter;
+    UseCase: UseCaseConstructor<any, any>;
+  };
+};
