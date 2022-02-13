@@ -6,8 +6,10 @@
   "license": "ISC",
   "description": "Automaticaly generated description",
   "scripts": {
-    "test": "mocha -r ts-node/register --full-trace --exclude src/**/*.component.spec.ts src/**/*.spec.ts",
-    "component-test": "mocha -r ts-node/register --full-trace src/**/*.component.spec.ts",
+    "test": "mocha -r ts-node/register --exclude src/**/*.component.spec.ts --exclude src/**/*.integration.spec.ts --exclude src/**/*.e2e.spec.ts src/**/*.spec.ts",
+    "component-test": "mocha -r ts-node/register src/**/*.component.spec.ts",
+    "integration-test": "mocha -r ts-node/register src/**/*.integration.spec.ts",
+    "e2e-test": "mocha -r ts-node/register src/**/*.e2e.spec.ts",
     "start": "node dist/main.js",
     "build": "tsc"
   },
