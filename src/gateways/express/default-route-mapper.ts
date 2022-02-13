@@ -14,7 +14,7 @@ const routeLookup = new Map<string, RouteData>([
   ['deleteEvent', { method: 'DELETE', path: '/event' }],
   ['findEventById', { method: 'GET', path: '/event' }],
   ['findEvents', { method: 'GET', path: '/event/find' }],
-  ['getEventSeatInfo', { method: 'GET', path: '/event/seats' }],
+  ['getEventSeatsInfo', { method: 'GET', path: '/event/seats' }],
   ['createHall', { method: 'POST', path: '/hall' }],
   ['deleteHall', { method: 'DELETE', path: '/hall' }],
   ['findHallById', { method: 'GET', path: '/hall' }],
