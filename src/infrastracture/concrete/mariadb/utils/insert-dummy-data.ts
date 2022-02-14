@@ -14,6 +14,8 @@ export default async function insertDummyData(pool: Pool): Promise<void> {
     [
       ['event-id-1', 'event no 1', 'hall-id-1', new Date('2020').getTime(), new Date('2021').getTime(), false, '[]'],
       ['event-id-2', 'event no 2', 'hall-id-3', new Date('2013').getTime(), new Date('2019').getTime(), true, '[2, 1]'],
+      ['event-id-3', 'event no 3', 'hall-id-2', new Date('2032').getTime(), new Date('2034').getTime(), true, '[]'],
+      ['event-id-4', 'event no 4', 'hall-id-2', new Date('2032').getTime(), new Date('2034').getTime(), false, '[]'],
     ],
   );
   await pool.batch(
