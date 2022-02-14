@@ -1,18 +1,28 @@
 import request from 'supertest';
 import { expect } from 'chai';
-import makeMariaDBStorageVendor from '../infrastracture/concrete/mariadb/make-maria-db-storage-vendor';
+import makeMariaDBStorageVendor from '../infrastracture/concrete/mariadb/make-mariadb-storage-vendor';
 import ConfigSingleton from '../utils/config-singleton';
 import ExpressGateway from './express/expres-gateway';
 import defaultRouteMapper from './express/default-route-mapper';
 import makeActionsFromSchema from '../controllers/make-actions-from-schema';
 import makeController from '../controllers/make-controller';
 import defaultActionSchema from '../controllers/action-schemas/default-action-schema';
+import MariaDBStorageVendor from '../infrastracture/concrete/mariadb/mariadb-storage-vendor';
 
 let expressApp: Express.Application;
+let storageVendor: MariaDBStorageVendor;
 
 describe('Express Gateway E2E tests', () => {
   before(async () => {
-    expressApp = (await setupExpressGateway()).expressApp;
+    const expressGateway = new ExpressGateway(defaultRouteMapper);
+    storageVendor = await makeMariaDBStorageVendor(ConfigSingleton.getConfig().mariadbConfig, 'TEST');
+    const actions = makeActionsFromSchema(defaultActionSchema, storageVendor);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const controller = makeController(actions, expressGateway);
+    expressApp = expressGateway.expressApp;
+  });
+  after(async () => {
+    await storageVendor.shutdown();
   });
   describe('/event', () => {
     describe('GET', () => {
@@ -736,13 +746,3 @@ describe('Express Gateway E2E tests', () => {
     });
   });
 });
-
-async function setupExpressGateway(): Promise<ExpressGateway> {
-  const expressGateway = new ExpressGateway(defaultRouteMapper);
-  const storageVendor = await makeMariaDBStorageVendor(ConfigSingleton.getConfig().mariadbConfig);
-  const actions = makeActionsFromSchema(defaultActionSchema, storageVendor);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const controller = makeController(actions, expressGateway);
-
-  return expressGateway;
-}
