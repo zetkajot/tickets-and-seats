@@ -6,6 +6,7 @@ type ComplexConverterFactorySetting = {
   argumentName: string,
   desiredName?: string,
   valueConverter?: ValueConverter
+  optional?: boolean;
 };
 
 type ValueConverter = (value: string) => any;
@@ -18,10 +19,11 @@ export default function makeInputConverter(
   ...settings: ConverterFactorySettings
 ): RequestConverter {
   const settingsMap = getSettingsMap(settings);
+  const optionalArgs = getOptionalArgumentsMap(settingsMap);
   return function inputConverter(request: ControllerRequest) {
     const { args } = request;
 
-    if (args.length < settingsMap.size) {
+    if (args.length < (settingsMap.size - optionalArgs.size)) {
       throw ErrorFactory.getInstance().makeError(InvalidRequestError);
     }
 
@@ -40,6 +42,13 @@ export default function makeInputConverter(
       }
     });
 
+    optionalArgs.forEach((setting, key) => {
+      if (!usedArgNames.has(key)) {
+        usedArgNames.add(key);
+        returnedObject[key] = undefined;
+      }
+    });
+
     if (usedArgNames.size !== settingsMap.size) {
       throw ErrorFactory.getInstance().makeError(InvalidRequestError);
     }
@@ -50,12 +59,16 @@ export default function makeInputConverter(
 
 function getSettingsMap(
   settings: ConverterFactorySettings,
-): Map<string, { desiredName: string, valueConverter: ValueConverter }> {
-  const settingsMap = new Map<string, { desiredName: string, valueConverter: ValueConverter }>();
+): Map<string, { desiredName: string, valueConverter: ValueConverter, optional: boolean }> {
+  const settingsMap = new Map<string, {
+    desiredName: string,
+    valueConverter: ValueConverter,
+    optional: boolean }>();
 
   settings.forEach((setting) => {
     const argName = getArgumentNameFromSetting(setting);
     settingsMap.set(argName, {
+      optional: getOptionalFlagValueFromSetting(setting),
       desiredName: getDesiredNameFromSetting(setting),
       valueConverter: getValueConverterFromSetting(setting),
     });
@@ -72,9 +85,35 @@ function getDesiredNameFromSetting(setting: string | ComplexConverterFactorySett
   return typeof setting === 'string' ? setting : setting.desiredName ?? setting.argumentName;
 }
 
+function getOptionalFlagValueFromSetting(
+  setting: string | ComplexConverterFactorySetting,
+): boolean {
+  return typeof setting === 'string' ? false : setting.optional ?? false;
+}
+
 function getValueConverterFromSetting(
   setting: string | ComplexConverterFactorySetting,
 ): ValueConverter {
   const fakeConverter = (value: string) => value;
   return typeof setting === 'string' ? fakeConverter : setting.valueConverter ?? fakeConverter;
+}
+
+function getOptionalArgumentsMap(
+  settingsMap: Map<
+  string,
+  { desiredName: string, valueConverter: ValueConverter, optional: boolean }
+  >,
+): Map<
+  string,
+  { desiredName: string, valueConverter: ValueConverter, optional: boolean }
+  > {
+  const optionalArgs = new Map<
+  string,
+  { desiredName: string, valueConverter: ValueConverter, optional: boolean }>();
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [name, setting] of settingsMap.entries()) {
+    // eslint-disable-next-line no-plusplus
+    if (setting.optional) optionalArgs.set(name, setting);
+  }
+  return optionalArgs;
 }
