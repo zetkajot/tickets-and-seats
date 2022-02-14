@@ -30,7 +30,7 @@ const SpiedMariaDBSV = class extends MariaDBStorageVendor {
       skipTableInitialization: false,
       ...userOptions,
     };
-    const sv = SpiedMariaDBSV.initSpied(pool, queries, converters, options);
+    const sv = new SpiedMariaDBSV(pool, queries, converters, options);
     if (!options.skipTableInitialization) {
       await MariaDBStorageVendor.initializeTables(pool);
     }
@@ -46,11 +46,14 @@ describe('MariaDB Storage Vendor test suite', () => {
     Sinon.reset();
   });
   describe('findHall method', () => {
-    const vendor = SpiedMariaDBSV.initSpied(
-      spiedPool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
+    let vendor: MariaDBStorageVendor;
+    before(async () => {
+      vendor = await SpiedMariaDBSV.initSpied(
+        spiedPool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+    });
     it('Prepares query by calling corresponding query factory using given data', async () => {
       await vendor.findHall({});
       expect(spiedQueryFactories.findHall)
@@ -69,12 +72,15 @@ describe('MariaDB Storage Vendor test suite', () => {
       expect(result).to.deep.equal(['converted', 'result']);
     });
   });
-  describe('findEvent method', () => {
-    const vendor = SpiedMariaDBSV.initSpied(
-      spiedPool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
+  describe('findEvent method', async () => {
+    let vendor: MariaDBStorageVendor;
+    before(async () => {
+      vendor = await SpiedMariaDBSV.initSpied(
+        spiedPool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+    });
     it('Prepares query by calling corresponding query factory using given data', async () => {
       await vendor.findEvent({});
       expect(spiedQueryFactories.findEvent)
@@ -95,11 +101,14 @@ describe('MariaDB Storage Vendor test suite', () => {
     });
   });
   describe('findTicket method', () => {
-    const vendor = SpiedMariaDBSV.initSpied(
-      spiedPool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
+    let vendor: MariaDBStorageVendor;
+    before(async () => {
+      vendor = await SpiedMariaDBSV.initSpied(
+        spiedPool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+    });
     it('Prepares query by calling corresponding query factory using given data', async () => {
       await vendor.findTicket({});
       expect(spiedQueryFactories.findTicket)
@@ -121,16 +130,20 @@ describe('MariaDB Storage Vendor test suite', () => {
   });
 
   describe('saveHall method', () => {
-    const affectingVendor = SpiedMariaDBSV.initSpied(
-      { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
-    const nonAffectingVendor = SpiedMariaDBSV.initSpied(
-      { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
+    let affectingVendor: MariaDBStorageVendor;
+    let nonAffectingVendor: MariaDBStorageVendor;
+    before(async () => {
+      affectingVendor = await SpiedMariaDBSV.initSpied(
+        { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+      nonAffectingVendor = await SpiedMariaDBSV.initSpied(
+        { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+    });
     it('Prepares query by calling corresponding query factory using given data', async () => {
       await affectingVendor.saveHall({} as any);
       expect(spiedQueryFactories.saveHall)
@@ -157,16 +170,20 @@ describe('MariaDB Storage Vendor test suite', () => {
     });
   });
   describe('saveEvent method', () => {
-    const affectingVendor = SpiedMariaDBSV.initSpied(
-      { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
-    const nonAffectingVendor = SpiedMariaDBSV.initSpied(
-      { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
+    let affectingVendor: MariaDBStorageVendor;
+    let nonAffectingVendor: MariaDBStorageVendor;
+    before(async () => {
+      affectingVendor = await SpiedMariaDBSV.initSpied(
+        { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+      nonAffectingVendor = await SpiedMariaDBSV.initSpied(
+        { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+    });
     it('Prepares query by calling corresponding query factory using given data', async () => {
       await affectingVendor.saveEvent({} as any);
       expect(spiedQueryFactories.saveEvent)
@@ -193,16 +210,20 @@ describe('MariaDB Storage Vendor test suite', () => {
     });
   });
   describe('saveTicket method', () => {
-    const affectingVendor = SpiedMariaDBSV.initSpied(
-      { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
-    const nonAffectingVendor = SpiedMariaDBSV.initSpied(
-      { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
+    let affectingVendor: MariaDBStorageVendor;
+    let nonAffectingVendor: MariaDBStorageVendor;
+    before(async () => {
+      affectingVendor = await SpiedMariaDBSV.initSpied(
+        { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+      nonAffectingVendor = await SpiedMariaDBSV.initSpied(
+        { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+    });
     it('Prepares query by calling corresponding query factory using given data', async () => {
       await affectingVendor.saveTicket({} as any);
       expect(spiedQueryFactories.saveTicket)
@@ -230,16 +251,20 @@ describe('MariaDB Storage Vendor test suite', () => {
   });
 
   describe('deleteHall method', () => {
-    const affectingVendor = SpiedMariaDBSV.initSpied(
-      { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
-    const nonAffectingVendor = SpiedMariaDBSV.initSpied(
-      { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
+    let affectingVendor: MariaDBStorageVendor;
+    let nonAffectingVendor: MariaDBStorageVendor;
+    before(async () => {
+      affectingVendor = await SpiedMariaDBSV.initSpied(
+        { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+      nonAffectingVendor = await SpiedMariaDBSV.initSpied(
+        { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+    });
     it('Prepares query by calling corresponding query factory using given data', async () => {
       await affectingVendor.deleteHall({} as any);
       expect(spiedQueryFactories.deleteHall)
@@ -266,16 +291,20 @@ describe('MariaDB Storage Vendor test suite', () => {
     });
   });
   describe('deleteEvent method', () => {
-    const affectingVendor = SpiedMariaDBSV.initSpied(
-      { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
-    const nonAffectingVendor = SpiedMariaDBSV.initSpied(
-      { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
+    let affectingVendor: MariaDBStorageVendor;
+    let nonAffectingVendor: MariaDBStorageVendor;
+    before(async () => {
+      affectingVendor = await SpiedMariaDBSV.initSpied(
+        { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+      nonAffectingVendor = await SpiedMariaDBSV.initSpied(
+        { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+    });
     it('Prepares query by calling corresponding query factory using given data', async () => {
       await affectingVendor.deleteEvent({} as any);
       expect(spiedQueryFactories.deleteEvent)
@@ -302,16 +331,20 @@ describe('MariaDB Storage Vendor test suite', () => {
     });
   });
   describe('deleteTicket method', () => {
-    const affectingVendor = SpiedMariaDBSV.initSpied(
-      { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
-    const nonAffectingVendor = SpiedMariaDBSV.initSpied(
-      { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
-      spiedQueryFactories,
-      spiedConverters,
-    );
+    let affectingVendor: MariaDBStorageVendor;
+    let nonAffectingVendor: MariaDBStorageVendor;
+    before(async () => {
+      affectingVendor = await SpiedMariaDBSV.initSpied(
+        { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+      nonAffectingVendor = await SpiedMariaDBSV.initSpied(
+        { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
+        spiedQueryFactories,
+        spiedConverters,
+      );
+    });
     it('Prepares query by calling corresponding query factory using given data', async () => {
       await affectingVendor.deleteTicket({} as any);
       expect(spiedQueryFactories.deleteTicket)

@@ -1,30 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { expect } from 'chai';
-import { createPool, Pool } from 'mariadb';
+import { Pool } from 'mariadb';
 import { StoredEventData } from '../../storage-vendors/event-storage-vendor';
 import { StoredHallData } from '../../storage-vendors/hall-storage-vendor';
 import { StoredTicketData } from '../../storage-vendors/ticket-storage-vendor';
-import makeMariaDBStorageVendor from './make-maria-db-storage-vendor';
 import MariaDBStorageVendor from './mariadb-storage-vendor';
 import ConfigSingleton from '../../../utils/config-singleton';
-import insertDummyData from './utils/insert-dummy-data';
-import removeStoredData from './utils/remove-stored-data';
+import makeMariaDBStorageVendor from './make-mariadb-storage-vendor';
 
-const connectionPool = createPool(ConfigSingleton.getConfig().mariadbConfig);
+const { mariadbConfig } = ConfigSingleton.getConfig();
 
 describe('MariaDB SV Component test suite', () => {
   let vendor: MariaDBStorageVendor;
-  before(async () => {
-    vendor = await makeMariaDBStorageVendor(connectionPool);
-    await removeStoredData(vendor.connectionPool);
-  });
-  after(async () => {
-    await removeStoredData(vendor.connectionPool);
-    await vendor.connectionPool.end();
-  });
   describe('Table schema', () => {
     let tables: string[];
     before(async () => {
+      vendor = await makeMariaDBStorageVendor(mariadbConfig, 'TEST');
       tables = await getTables(vendor.connectionPool);
     });
     it('Has \'event\' table', () => {
@@ -36,13 +27,16 @@ describe('MariaDB SV Component test suite', () => {
     it('Has \'hall\' table', () => {
       expect(tables).to.include('hall');
     });
+    after(async () => {
+      await vendor.shutdown();
+    });
   });
   describe('methods tests', () => {
     beforeEach(async () => {
-      await insertDummyData(vendor.connectionPool);
+      vendor = await makeMariaDBStorageVendor(mariadbConfig, 'TEST');
     });
     afterEach(async () => {
-      await removeStoredData(vendor.connectionPool);
+      await vendor.shutdown();
     });
     describe('findHall', () => {
       it('Returns matching data stored in DB', async () => {
