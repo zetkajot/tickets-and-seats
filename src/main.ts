@@ -4,7 +4,7 @@ import ConfigSingleton from './utils/config-singleton';
 import makeController from './controllers/make-controller';
 import ExpressGateway from './gateways/express/expres-gateway';
 import defaultRouteMapper from './gateways/express/default-route-mapper';
-import makeActionsFromSchema from './controllers/make-action-schema';
+import makeActionsFromSchema from './controllers/make-actions-from-schema';
 import defaultActionSchema from './controllers/action-schemas/default-action-schema';
 
 start().then(() => {
