@@ -16,12 +16,37 @@ const spiedModifyQueryExecutor = {
 
 const spiedPool = { query: spiedFindQueryExecutor } as unknown as Pool;
 
+const SpiedMariaDBSV = class extends MariaDBStorageVendor {
+  public static async initSpied(
+    pool: Pool,
+    queries: QueryFactories,
+    converters: ResultSetConverters,
+    userOptions?: any,
+  ) {
+    const options = {
+      dropTablesOnShutdown: false,
+      removeDataOnShutdown: false,
+      removeDataOnStart: false,
+      skipTableInitialization: false,
+      ...userOptions,
+    };
+    const sv = SpiedMariaDBSV.initSpied(pool, queries, converters, options);
+    if (!options.skipTableInitialization) {
+      await MariaDBStorageVendor.initializeTables(pool);
+    }
+    if (options.removeDataOnStart) {
+      await MariaDBStorageVendor.clearTableData(pool);
+    }
+    return sv;
+  }
+};
+
 describe('MariaDB Storage Vendor test suite', () => {
   beforeEach(() => {
     Sinon.reset();
   });
   describe('findHall method', () => {
-    const vendor = new MariaDBStorageVendor(
+    const vendor = SpiedMariaDBSV.initSpied(
       spiedPool,
       spiedQueryFactories,
       spiedConverters,
@@ -45,7 +70,7 @@ describe('MariaDB Storage Vendor test suite', () => {
     });
   });
   describe('findEvent method', () => {
-    const vendor = new MariaDBStorageVendor(
+    const vendor = SpiedMariaDBSV.initSpied(
       spiedPool,
       spiedQueryFactories,
       spiedConverters,
@@ -70,7 +95,7 @@ describe('MariaDB Storage Vendor test suite', () => {
     });
   });
   describe('findTicket method', () => {
-    const vendor = new MariaDBStorageVendor(
+    const vendor = SpiedMariaDBSV.initSpied(
       spiedPool,
       spiedQueryFactories,
       spiedConverters,
@@ -96,12 +121,12 @@ describe('MariaDB Storage Vendor test suite', () => {
   });
 
   describe('saveHall method', () => {
-    const affectingVendor = new MariaDBStorageVendor(
+    const affectingVendor = SpiedMariaDBSV.initSpied(
       { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
       spiedQueryFactories,
       spiedConverters,
     );
-    const nonAffectingVendor = new MariaDBStorageVendor(
+    const nonAffectingVendor = SpiedMariaDBSV.initSpied(
       { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
       spiedQueryFactories,
       spiedConverters,
@@ -132,12 +157,12 @@ describe('MariaDB Storage Vendor test suite', () => {
     });
   });
   describe('saveEvent method', () => {
-    const affectingVendor = new MariaDBStorageVendor(
+    const affectingVendor = SpiedMariaDBSV.initSpied(
       { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
       spiedQueryFactories,
       spiedConverters,
     );
-    const nonAffectingVendor = new MariaDBStorageVendor(
+    const nonAffectingVendor = SpiedMariaDBSV.initSpied(
       { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
       spiedQueryFactories,
       spiedConverters,
@@ -168,12 +193,12 @@ describe('MariaDB Storage Vendor test suite', () => {
     });
   });
   describe('saveTicket method', () => {
-    const affectingVendor = new MariaDBStorageVendor(
+    const affectingVendor = SpiedMariaDBSV.initSpied(
       { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
       spiedQueryFactories,
       spiedConverters,
     );
-    const nonAffectingVendor = new MariaDBStorageVendor(
+    const nonAffectingVendor = SpiedMariaDBSV.initSpied(
       { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
       spiedQueryFactories,
       spiedConverters,
@@ -205,12 +230,12 @@ describe('MariaDB Storage Vendor test suite', () => {
   });
 
   describe('deleteHall method', () => {
-    const affectingVendor = new MariaDBStorageVendor(
+    const affectingVendor = SpiedMariaDBSV.initSpied(
       { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
       spiedQueryFactories,
       spiedConverters,
     );
-    const nonAffectingVendor = new MariaDBStorageVendor(
+    const nonAffectingVendor = SpiedMariaDBSV.initSpied(
       { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
       spiedQueryFactories,
       spiedConverters,
@@ -241,12 +266,12 @@ describe('MariaDB Storage Vendor test suite', () => {
     });
   });
   describe('deleteEvent method', () => {
-    const affectingVendor = new MariaDBStorageVendor(
+    const affectingVendor = SpiedMariaDBSV.initSpied(
       { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
       spiedQueryFactories,
       spiedConverters,
     );
-    const nonAffectingVendor = new MariaDBStorageVendor(
+    const nonAffectingVendor = SpiedMariaDBSV.initSpied(
       { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
       spiedQueryFactories,
       spiedConverters,
@@ -277,12 +302,12 @@ describe('MariaDB Storage Vendor test suite', () => {
     });
   });
   describe('deleteTicket method', () => {
-    const affectingVendor = new MariaDBStorageVendor(
+    const affectingVendor = SpiedMariaDBSV.initSpied(
       { query: spiedModifyQueryExecutor.affecting } as unknown as Pool,
       spiedQueryFactories,
       spiedConverters,
     );
-    const nonAffectingVendor = new MariaDBStorageVendor(
+    const nonAffectingVendor = SpiedMariaDBSV.initSpied(
       { query: spiedModifyQueryExecutor.nonAffecting } as unknown as Pool,
       spiedQueryFactories,
       spiedConverters,
