@@ -1,7 +1,10 @@
 import { ConverterFactorySettings } from '../make-input-converter';
 
 const toValidateTicketInputTemplate: ConverterFactorySettings = [
-  'ticketId',
+  {
+    argumentName: 'id',
+    desiredName: 'ticketId',
+  },
 ];
 
 export default toValidateTicketInputTemplate;

@@ -1,7 +1,14 @@
 import { ConverterFactorySettings } from '../make-input-converter';
 
 const toFindEventsInputTemplate: ConverterFactorySettings = [
-  'name', 'hallId',
+  {
+    argumentName: 'name',
+    optional: true,
+  },
+  {
+    argumentName: 'hallId',
+    optional: true,
+  },
 ];
 
 export default toFindEventsInputTemplate;

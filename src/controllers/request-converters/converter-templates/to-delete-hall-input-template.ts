@@ -1,7 +1,10 @@
 import { ConverterFactorySettings } from '../make-input-converter';
 
 const toDeleteHallInputTemplate: ConverterFactorySettings = [
-  'hallId',
+  {
+    desiredName: 'hallId',
+    argumentName: 'id',
+  },
 ];
 
 export default toDeleteHallInputTemplate;

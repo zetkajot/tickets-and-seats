@@ -1,7 +1,10 @@
 import { ConverterFactorySettings } from '../make-input-converter';
 
 const toDeleteEventInputTemplate: ConverterFactorySettings = [
-  'eventId',
+  {
+    argumentName: 'id',
+    desiredName: 'eventId',
+  },
 ];
 
 export default toDeleteEventInputTemplate;

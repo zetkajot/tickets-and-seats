@@ -1,7 +1,10 @@
 import { ConverterFactorySettings } from '../make-input-converter';
 
 const toFindHallsInputTemplate: ConverterFactorySettings = [
-  'name',
+  {
+    argumentName: 'name',
+    optional: true,
+  },
 ];
 
 export default toFindHallsInputTemplate;
