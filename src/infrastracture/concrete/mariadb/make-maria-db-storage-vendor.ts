@@ -13,6 +13,7 @@ import { QueryFactories } from './types/query-factories';
 import { ResultSetConverters } from './types/result-set-converters';
 import insertDummyData from './utils/insert-dummy-data';
 import removeStoredData from './utils/remove-stored-data';
+import removeTables from './utils/remove-tables';
 
 export default async function makeMariaDBStorageVendor(
   config: PoolConfig | Pool,
@@ -78,6 +79,8 @@ function injectErrorHandlerToConnectionPool(pool: Pool): void {
 
 async function setupTestEnvironment(pool: Pool): Promise<void> {
   console.log('[INFO]MariaDB Storage Vendor running in TEST environment');
+  await removeTables(pool);
+  await createTables(pool);
   await removeStoredData(pool);
   await insertDummyData(pool);
 }
