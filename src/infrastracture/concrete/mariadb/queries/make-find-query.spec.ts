@@ -14,9 +14,9 @@ describe('Find Query factory test suite', () => {
 
     expect(query[query.length - 1]).to.equal(';');
   });
-  describe('When all parameters are undefined', () => {
+  describe('When all parameters are undefined or not set', () => {
     it('Query has no WHERE clause', () => {
-      const query = makeFindQuery('some_table', {});
+      const query = makeFindQuery('some_table', { param1: undefined });
 
       expect(query).to.not.include('WHERE');
     });
@@ -43,6 +43,11 @@ describe('Find Query factory test suite', () => {
       const query = makeFindQuery('some_table', { param1: 13, param2: true });
 
       expect(query).to.include('WHERE param1 = 13 AND param2 = true;');
+    });
+    it('Undefined parameters are skipped', () => {
+      const query = makeFindQuery('some_table', { param1: undefined, param2: 'value' });
+
+      expect(query).to.include('WHERE param2 = \'value\';');
     });
   });
 });
