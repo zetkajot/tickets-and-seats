@@ -5,8 +5,7 @@ type ControllerOkResponse = {
 
 type ControllerErrorResponse = {
   isOk: false,
-  errorName: string,
-  errorMessage: string,
+  error: Error,
 };
 
 export type ControllerResponse = ControllerOkResponse | ControllerErrorResponse;
