@@ -8,8 +8,7 @@ const toCreateHallInputTemplate: ConverterFactorySettings = [
     desiredName: 'hallName',
   },
   {
-    argumentName: 'layout',
-    desiredName: 'seatLayout',
+    argumentName: 'seatLayout',
     valueConverter: tryParsingLayout,
   },
 ];

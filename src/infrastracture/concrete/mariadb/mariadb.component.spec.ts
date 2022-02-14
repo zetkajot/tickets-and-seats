@@ -9,18 +9,17 @@ import MariaDBStorageVendor from './mariadb-storage-vendor';
 import ConfigSingleton from '../../../utils/config-singleton';
 import insertDummyData from './utils/insert-dummy-data';
 import removeStoredData from './utils/remove-stored-data';
-import removeTables from './utils/remove-tables';
 
 const connectionPool = createPool(ConfigSingleton.getConfig().mariadbConfig);
 
 describe('MariaDB SV Component test suite', () => {
   let vendor: MariaDBStorageVendor;
   before(async () => {
-    await removeTables(connectionPool);
     vendor = await makeMariaDBStorageVendor(connectionPool);
+    await removeStoredData(vendor.connectionPool);
   });
   after(async () => {
-    await removeTables(vendor.connectionPool);
+    await removeStoredData(vendor.connectionPool);
     await vendor.connectionPool.end();
   });
   describe('Table schema', () => {

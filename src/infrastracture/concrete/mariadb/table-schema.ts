@@ -4,6 +4,7 @@ const ticketSchema = 'CREATE TABLE IF NOT EXISTS Ticket ('
                        + 'seatno MEDIUMINT NOT NULL,'
                        + 'CONSTRAINT `fk_ticket_event`'
                            + 'FOREIGN KEY (eventid) REFERENCES Event (id)'
+                           + 'ON DELETE CASCADE'
                    + ');';
 
 const hallSchema = 'CREATE TABLE IF NOT EXISTS Hall ('
@@ -22,6 +23,7 @@ const eventSchema = 'CREATE TABLE IF NOT EXISTS Event ('
                       + 'reservedseats JSON NOT NULL,'
                       + 'CONSTRAINT `fk_event_hall`'
                           + 'FOREIGN KEY (hallid) REFERENCES Hall (id)'
+                          + 'ON DELETE CASCADE'
                   + ');';
 
 const tableSchema = {

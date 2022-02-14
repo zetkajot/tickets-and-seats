@@ -1,3 +1,3 @@
 export default class InvalidRequestError extends Error {
-  name: string = 'InvalidRequestError';
+  name: string = 'Invalid Request Error';
 }

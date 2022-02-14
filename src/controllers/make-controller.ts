@@ -37,8 +37,7 @@ async function actionHandler<Input, Output>(
 function makeErrorResponse(error: Error): ControllerResponse {
   return {
     isOk: false,
-    errorName: error.name,
-    errorMessage: error.message,
+    error,
   };
 }
 

@@ -109,10 +109,11 @@ describe('New Controller test suite', () => {
     });
     describe('When error occurs', () => {
       it('Returns error response', async () => {
+        const thrownError = new Error('Converter error');
         const dummyActionsWithThrowingConverter: Actions = {
           ...dummyActions,
           action1: {
-            converter: () => { throw new Error('Converter error'); },
+            converter: () => { throw thrownError; },
             useCase: dummyUseCase,
           },
         };
@@ -122,8 +123,7 @@ describe('New Controller test suite', () => {
 
         expect(response).to.deep.equal({
           isOk: false,
-          errorName: 'Error',
-          errorMessage: 'Converter error',
+          error: thrownError,
         });
       });
     });

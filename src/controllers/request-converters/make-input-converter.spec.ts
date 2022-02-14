@@ -174,5 +174,26 @@ describe('makeInputConverter test suite', () => {
         expect(output).to.deep.equal({ arg1: 'some-value' });
       });
     });
+    describe('When given argument has \'optional\' flag set to true', () => {
+      it('is not counted to total ammount of required args', () => {
+        const converter = makeInputConverter('arg1', {
+          argumentName: 'arg2',
+          optional: true,
+        });
+        const request = {
+          action: 'some action',
+          args: [
+            {
+              name: 'arg1',
+              value: 'some value',
+            },
+          ],
+        };
+
+        const tryConverting = () => converter(request);
+
+        expect(tryConverting).to.not.throw(InvalidRequestError);
+      });
+    });
   });
 });
