@@ -11,6 +11,8 @@ import resultSetToTicketData from './result-converters/result-set-to-ticket-data
 import tableSchema from './table-schema';
 import { QueryFactories } from './types/query-factories';
 import { ResultSetConverters } from './types/result-set-converters';
+import insertDummyData from './utils/insert-dummy-data';
+import removeStoredData from './utils/remove-stored-data';
 
 export default async function makeMariaDBStorageVendor(
   config: PoolConfig | Pool,
@@ -19,6 +21,10 @@ export default async function makeMariaDBStorageVendor(
   injectErrorHandlerToConnectionPool(connectionPool);
 
   await createTables(connectionPool);
+
+  if (process.env.NODE_ENV === 'test') {
+    await setupTestEnvironment(connectionPool);
+  }
 
   return new MariaDBStorageVendor(
     connectionPool,
@@ -68,4 +74,10 @@ function injectErrorHandlerToConnectionPool(pool: Pool): void {
       return context.asyncExecute(...args);
     },
   });
+}
+
+async function setupTestEnvironment(pool: Pool): Promise<void> {
+  console.log('[INFO]MariaDB Storage Vendor running in TEST environment');
+  await removeStoredData(pool);
+  await insertDummyData(pool);
 }
