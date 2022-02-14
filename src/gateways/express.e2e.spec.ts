@@ -559,6 +559,182 @@ describe('Express Gateway E2E tests', () => {
       });
     });
   });
+  describe('/ticket', () => {
+    describe('GET', () => {
+      describe('With \'id\' param not set', () => {
+        it('Responds with error response indicating Invalid Request Error', async () => {
+          const response = await request(expressApp)
+            .get('/ticket');
+          expect(response.statusCode).to.equal(400);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Request Error',
+            errorMessage: '',
+          });
+        });
+      });
+      describe('With \'id\' param set to id of nonexistent ticket', () => {
+        it('Responds with error response indicating Invalid Data Error', async () => {
+          const response = await request(expressApp)
+            .get('/ticket?id=non-existent-ticket-id');
+          expect(response.statusCode).to.equal(404);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Data Error',
+            errorMessage: 'Entity you were looking for was not found!',
+          });
+        });
+      });
+      describe('with \'id\' param set to id of existing ticket', () => {
+        it('Responds with stored ticket data', async () => {
+          const response = await request(expressApp)
+            .get('/ticket?id=ticket-id-1');
+          expect(response.statusCode).to.equal(200);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: true,
+            data: {
+              ticketId: 'ticket-id-1',
+              eventName: 'event no 2',
+              hallName: 'hall no 3',
+              startingDate: new Date('2013').toJSON(),
+              seatNo: 1,
+            },
+          });
+        });
+      });
+    });
+    describe('DELETE ', () => {
+      describe('With \'id\' param not set', () => {
+        it('Responds with error response indicating Invalid Request Error', async () => {
+          const response = await request(expressApp)
+            .delete('/event');
+          expect(response.statusCode).to.equal(400);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Request Error',
+            errorMessage: '',
+          });
+        });
+      });
+      describe('With \'id\' param set to id of nonexistent ticket', () => {
+        it('Responds with error response indicating Invalid Data Error', async () => {
+          const response = await request(expressApp)
+            .delete('/ticket?id=non-existent-ticket-id');
+          expect(response.statusCode).to.equal(404);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Data Error',
+            errorMessage: 'Entity you were looking for was not found!',
+          });
+        });
+      });
+      describe('with \'id\' param set to id of existing ticket', () => {
+        it('Responds with deleted ticket data', async () => {
+          const response = await request(expressApp)
+            .delete('/ticket?id=ticket-id-2');
+          expect(response.statusCode).to.equal(200);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: true,
+            data: {
+              eventId: 'event-id-2',
+              ticketId: 'ticket-id-2',
+              seatNo: 2,
+            },
+          });
+        });
+      });
+    });
+    describe('POST', () => {
+      describe('With one or more parameters from \'eventId\', \'seatNo\' missing', () => {
+        it('Responds with error response indicating Invalid Request Error', async () => {
+          const response = await request(expressApp)
+            .post('/ticket?eventId=event-id-3');
+          expect(response.statusCode).to.equal(400);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Request Error',
+            errorMessage: '',
+          });
+        });
+      });
+      describe('With all aforementioned params set', () => {
+        describe('When \'eventId\' is set to id of nonexistent event', () => {
+          it('Responds with InvalidDataError', async () => {
+            const response = await request(expressApp)
+              .post('/ticket?eventId=non-existent-event-id&seatNo=1');
+
+            expect(response.statusCode).to.equal(404);
+            expect(response.headers['content-type']).to.include('application/json');
+            expect(response.body).to.deep.equal({
+              isOk: false,
+              errorName: 'Invalid Data Error',
+              errorMessage: 'Entity you were looking for was not found!',
+            });
+          });
+        });
+        describe('When \'eventId\' is set to id of closed event', async () => {
+          const response = await request(expressApp)
+            .post('/ticket?eventId=event-id-5&seatNo=1');
+
+          expect(response.statusCode).to.equal(404);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Data Error',
+            errorMessage: 'Event you are trying to interact with is closed for reservations!',
+          });
+        });
+        describe('When seat with number \'seatNo\' is taken', async () => {
+          const response = await request(expressApp)
+            .post('/ticket?eventId=event-id-2&seatNo=2');
+
+          expect(response.statusCode).to.equal(409);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Data Error',
+            errorMessage: 'Seat is already taken!',
+          });
+        });
+        describe('When seat with number \'seatNo\' does not exist', async () => {
+          const response = await request(expressApp)
+            .post('/ticket?eventId=event-id-2&seatNo=99');
+
+          expect(response.statusCode).to.equal(409);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Data Error',
+            errorMessage: 'Seat does not exist!',
+          });
+        });
+        describe('When params contain valid ticket data', () => {
+          it('Responds with created ticket data', async () => {
+            const response = await request(expressApp)
+              .post('/ticket?eventId=event-id-5&seatNo=1');
+
+            expect(response.statusCode).to.equal(200);
+            expect(response.headers['content-type']).to.include('application/json');
+            expect(response.body.data).to.deep.include({
+              seatNo: 1,
+              hallId: 'hall-id-2',
+              eventId: 'event-id-5',
+              eventName: 'event no 5',
+              eventStartingDate: new Date('2032').toJSON(),
+              eventEndingDate: new Date('2034').toJSON(),
+            });
+          });
+        });
+      });
+    });
+  });
 });
 
 async function setupExpressGateway(): Promise<ExpressGateway> {
