@@ -7,6 +7,9 @@ import { StoredTicketData } from '../../storage-vendors/ticket-storage-vendor';
 import makeMariaDBStorageVendor from './make-maria-db-storage-vendor';
 import MariaDBStorageVendor from './mariadb-storage-vendor';
 import ConfigSingleton from '../../../utils/config-singleton';
+import insertDummyData from './utils/insert-dummy-data';
+import removeStoredData from './utils/remove-stored-data';
+import removeTables from './utils/remove-tables';
 
 const connectionPool = createPool(ConfigSingleton.getConfig().mariadbConfig);
 
@@ -178,39 +181,4 @@ describe('MariaDB SV Component test suite', () => {
 async function getTables(pool: Pool): Promise<string[]> {
   const queryResult = <[{ Tables_in_test: string }]> await pool.query('SHOW TABLES;');
   return queryResult.map((row) => row.Tables_in_test);
-}
-
-async function removeTables(pool: Pool): Promise<void> {
-  await pool.query('DROP TABLE IF EXISTS ticket, event, hall;');
-}
-
-async function insertDummyData(pool: Pool): Promise<void> {
-  await pool.batch(
-    'INSERT INTO hall (id, name, layout) VALUES (?, ?, ?);',
-    [
-      ['hall-id-1', 'hall no 1', '[]'],
-      ['hall-id-2', 'hall no 2', '[[1, 0, 0]]'],
-      ['hall-id-3', 'hall no 3', '[[2, 0, 0], [1, 10, 10]]'],
-    ],
-  );
-  await pool.batch(
-    'INSERT INTO event (id, name, hallid, startsat, endsat, isopen, reservedseats) VALUES (?, ?, ?, ?, ?, ?, ?);',
-    [
-      ['event-id-1', 'event no 1', 'hall-id-1', new Date('2020').getTime(), new Date('2021').getTime(), false, '[]'],
-      ['event-id-2', 'event no 2', 'hall-id-3', new Date('2013').getTime(), new Date('2019').getTime(), true, '[2, 1]'],
-    ],
-  );
-  await pool.batch(
-    'INSERT INTO ticket (id, eventid, seatno) VALUES (?, ?, ?);',
-    [
-      ['ticket-id-1', 'event-id-2', 1],
-      ['ticket-id-2', 'event-id-2', 2],
-    ],
-  );
-}
-
-async function removeStoredData(pool: Pool): Promise<void> {
-  await pool.query('DELETE FROM ticket');
-  await pool.query('DELETE FROM event');
-  await pool.query('DELETE FROM hall');
 }
