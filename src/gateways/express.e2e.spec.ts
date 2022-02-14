@@ -384,6 +384,181 @@ describe('Express Gateway E2E tests', () => {
       });
     });
   });
+  describe('/hall', () => {
+    describe('GET', () => {
+      describe('With \'id\' param not set', () => {
+        it('Responds with error response indicating Invalid Request Error', async () => {
+          const response = await request(expressApp)
+            .get('/hall');
+          expect(response.statusCode).to.equal(400);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Request Error',
+            errorMessage: '',
+          });
+        });
+      });
+      describe('With \'id\' param set to id of nonexistent hall', () => {
+        it('Responds with error response indicating Invalid Data Error', async () => {
+          const response = await request(expressApp)
+            .get('/hall?id=non-existent-hall-id');
+          expect(response.statusCode).to.equal(404);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Data Error',
+            errorMessage: 'Entity you were looking for was not found!',
+          });
+        });
+      });
+      describe('with \'id\' param set to id of existing hall', () => {
+        it('Responds with stored hall data', async () => {
+          const response = await request(expressApp)
+            .get('/hall?id=hall-id-1');
+          expect(response.statusCode).to.equal(200);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: true,
+            data: {
+              hallId: 'hall-id-1',
+              hallName: 'hall no 1',
+              seatLayout: [],
+            },
+          });
+        });
+      });
+    });
+    describe('DELETE ', () => {
+      describe('With \'id\' param not set', () => {
+        it('Responds with error response indicating Invalid Request Error', async () => {
+          const response = await request(expressApp)
+            .delete('/hall');
+          expect(response.statusCode).to.equal(400);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Request Error',
+            errorMessage: '',
+          });
+        });
+      });
+      describe('With \'id\' param set to id of nonexistent hall', () => {
+        it('Responds with error response indicating Invalid Data Error', async () => {
+          const response = await request(expressApp)
+            .delete('/hall?id=non-existent-hall-id');
+          expect(response.statusCode).to.equal(404);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Data Error',
+            errorMessage: 'Entity you were looking for was not found!',
+          });
+        });
+      });
+      describe('with \'id\' param set to id of existing hall', () => {
+        it('Responds with deleted hall data', async () => {
+          const response = await request(expressApp)
+            .delete('/hall?id=hall-id-4');
+          expect(response.statusCode).to.equal(200);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: true,
+            data: {
+              hallId: 'hall-id-4',
+              hallName: 'hall no 4',
+            },
+          });
+        });
+      });
+    });
+    describe('POST', () => {
+      describe('With one or more parameters from \'name\', \'seatLayout\' missing', () => {
+        it('Responds with error response indicating Invalid Request Error', async () => {
+          const response = await request(expressApp)
+            .post('/hall?name=hall with missing params');
+          expect(response.statusCode).to.equal(400);
+          expect(response.headers['content-type']).to.include('application/json');
+          expect(response.body).to.deep.equal({
+            isOk: false,
+            errorName: 'Invalid Request Error',
+            errorMessage: '',
+          });
+        });
+      });
+      describe('With all aforementioned params set', () => {
+        describe('When params contain invalid hall data', () => {
+          it('Responds with error response indicating Invalid Data Error', async () => {
+            const response = await request(expressApp)
+              .post('/hall?name=hall with invalid layout&seatLayout=[{"seatNo":0, "seatPosition": {"x": 1, "y": 2}}, {"seatNo":0, "seatPosition": {"x": 1, "y": 2}}]');
+            expect(response.statusCode).to.equal(422);
+            expect(response.headers['content-type']).to.include('application/json');
+            expect(response.body).to.deep.equal({
+              isOk: false,
+              errorName: 'Invalid Data Error',
+              errorMessage: 'Hall data you provided is invalid!',
+            });
+          });
+        });
+        describe('When params contain valid hall data', () => {
+          it('Responds with created hall data', async () => {
+            const response = await request(expressApp)
+              .post('/hall?name=my hall&seatLayout=[{"seatNo":0, "seatPosition": {"x": 1, "y": 2}}]');
+            expect(response.statusCode).to.equal(200);
+            expect(response.headers['content-type']).to.include('application/json');
+            expect(response.body.data).to.deep.include({
+              hallName: 'my hall',
+              seatLayout: [{
+                seatNo: 0,
+                seatPosition: {
+                  x: 1,
+                  y: 2,
+                },
+              }],
+            });
+          });
+        });
+      });
+    });
+    describe('/hall/find', () => {
+      describe('GET', () => {
+        describe('With no params', () => {
+          it('Responds with data of all stored halls', async () => {
+            const response = await request(expressApp)
+              .get('/hall/find');
+            expect(response.statusCode).to.equal(200);
+            expect(response.headers['content-type']).to.include('application/json');
+            expect(response.body.data).to.include.deep.members([
+              {
+                hallName: 'hall no 1',
+                hallId: 'hall-id-1',
+              },
+              {
+                hallName: 'hall no 2',
+                hallId: 'hall-id-2',
+              },
+              {
+                hallName: 'hall no 3',
+                hallId: 'hall-id-3',
+              },
+            ]);
+          });
+        });
+        describe('With one or more params set', () => {
+          it('Responds with data of matching stored halls', async () => {
+            const response = await request(expressApp)
+              .get('/hall/find?name=hall no 1');
+            expect(response.statusCode).to.equal(200);
+            expect(response.headers['content-type']).to.include('application/json');
+            expect(response.body.data).to.deep.include({
+              hallName: 'hall no 1',
+              hallId: 'hall-id-1',
+            });
+          });
+        });
+      });
+    });
+  });
 });
 
 async function setupExpressGateway(): Promise<ExpressGateway> {
