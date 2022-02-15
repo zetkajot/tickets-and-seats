@@ -1,0 +1,14 @@
+{
+  "actions": {
+    "findEvent": {
+      "useCase": "FindEventById",
+      "inputSchema": [
+        {
+          "argName": "id",
+          "desiredName": "eventId",
+          "type": "STRING"
+        }
+      ]
+    }
+  }
+}
