@@ -1,5 +1,6 @@
 import CombinedStorageVendor from '../infrastracture/storage-vendors/combined-storage-vendor';
 import UseCase from '../use-cases/use-case';
+import { ActionHandler } from './types/action-handler';
 import convertRequestArguments from './argument-converters/convert-request-arguments';
 import { ConversionResult } from './argument-converters/types/conversion-result';
 import InvalidRequestError from './errors/invalid-request-error';
@@ -8,7 +9,6 @@ import { ControllerRequestArguments } from './types/controller-request-arguments
 import { ControllerResponse } from './types/controller-response';
 import { ControllerSchema } from './types/controller-schema';
 
-type ActionHandler = (request: ControllerRequest) => Promise<unknown>;
 type BoundConverter = (requestArgs: ControllerRequestArguments) => ConversionResult;
 type StoredAction = {
   useCase: UseCase<any, any>,
