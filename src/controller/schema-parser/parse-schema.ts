@@ -8,6 +8,7 @@ import useCaseConstructorLibrary from './use-case-constructor-library';
 
 export default function parseSchema(location: PathOrFileDescriptor): ControllerSchema {
   let fileContent;
+  console.log(`Loading Controller Schema from ${location}`);
   try {
     fileContent = readFileSync(location, {
       encoding: 'utf8',
@@ -42,14 +43,14 @@ function parseUseCase(value: string): UseCaseConstructor<unknown, unknown> {
   if (value in useCaseConstructorLibrary) {
     return useCaseConstructorLibrary[value as keyof typeof useCaseConstructorLibrary];
   }
-  throw new ControllerSchemaError(ControllerSchemaErrorSubtype.UNKNOWN_USECASE);
+  throw new ControllerSchemaError(ControllerSchemaErrorSubtype.UNKNOWN_USECASE, value);
 }
 
 function parseType(value: string): InputSchemaType {
   if (value in inputSchemaTypesLibrary) {
     return inputSchemaTypesLibrary[value as keyof typeof inputSchemaTypesLibrary];
   }
-  throw new ControllerSchemaError(ControllerSchemaErrorSubtype.UNKNOWN_TYPE);
+  throw new ControllerSchemaError(ControllerSchemaErrorSubtype.UNKNOWN_TYPE, value);
 }
 
 function validateStructure(obj: any) {
