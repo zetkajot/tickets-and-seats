@@ -7,6 +7,8 @@ export default class QueryCreationDirector {
   createQuery(tableName: string, fields: Record<string, any>): BuiltQuery {
     this.builder.setTableName(tableName);
     Object.entries(fields).forEach((nameValuePair) => this.builder.setField(...nameValuePair));
-    return this.builder.buildQuery();
+    const builtQuery = this.builder.buildQuery();
+    this.builder.reset();
+    return builtQuery;
   }
 }

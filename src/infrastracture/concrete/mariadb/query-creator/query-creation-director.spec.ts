@@ -7,6 +7,7 @@ const dummyQueryBuilder: QueryBuilder = {
   buildQuery: Sinon.spy(() => ({ query: 'some-query', values: [] })),
   setField: Sinon.spy(),
   setTableName: Sinon.spy(),
+  reset: Sinon.spy(),
 };
 
 const director = new QueryCreationDirector(dummyQueryBuilder);
@@ -32,6 +33,10 @@ describe('Query Creation Director test suite', () => {
     it('Calls buildQuery method on QueryBuilder', () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       expect(dummyQueryBuilder.buildQuery).to.have.been.calledOnce;
+    });
+    it('Calls reset method on QueryBuilder after returning built query', () => {
+      expect(dummyQueryBuilder.reset)
+        .to.have.been.calledImmediatelyAfter(dummyQueryBuilder.buildQuery as SinonSpy);
     });
   });
 });

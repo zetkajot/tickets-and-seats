@@ -3,6 +3,12 @@ import { BuiltQuery } from '../types/built-query';
 import QueryBuilder from '../types/query-builder';
 
 export default class SelectQueryBuilder implements QueryBuilder {
+  reset(): void {
+    this.tableName = '';
+    this.fieldNames = [];
+    this.fieldValues = [];
+  }
+
   private fieldNames: string[] = [];
 
   private fieldValues: string[] = [];
