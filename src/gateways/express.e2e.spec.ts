@@ -1,28 +1,30 @@
 import request from 'supertest';
 import { expect } from 'chai';
+import path from 'node:path/win32';
 import makeMariaDBStorageVendor from '../infrastracture/concrete/mariadb/make-mariadb-storage-vendor';
 import ConfigSingleton from '../utils/config-singleton';
 import ExpressGateway from './express/expres-gateway';
-import defaultRouteMapper from './express/default-route-mapper';
-import makeActionsFromSchema from '../controllers/make-actions-from-schema';
-import makeController from '../controllers/make-controller';
-import defaultActionSchema from '../controllers/action-schemas/default-action-schema';
+import parseSchema from '../controller/schema-parser/parse-schema';
 import MariaDBStorageVendor from '../infrastracture/concrete/mariadb/mariadb-storage-vendor';
+import defaultExpressRouteSchema from '../schemas/default-express-route-schema';
+import Controller from '../controller/controller';
+import startInTestEnvironment from '../infrastracture/concrete/mariadb/utils/start-in-test-environment';
+import stopInTestEnvironment from '../infrastracture/concrete/mariadb/utils/stop-in-test-environment';
 
 let expressApp: Express.Application;
 let storageVendor: MariaDBStorageVendor;
 
 describe('Express Gateway E2E tests', () => {
   before(async () => {
-    const expressGateway = new ExpressGateway(defaultRouteMapper);
-    storageVendor = await makeMariaDBStorageVendor(ConfigSingleton.getConfig().mariadbConfig, 'TEST');
-    const actions = makeActionsFromSchema(defaultActionSchema, storageVendor);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const controller = makeController(actions, expressGateway);
-    expressApp = expressGateway.expressApp;
+    storageVendor = makeMariaDBStorageVendor(ConfigSingleton.getConfig().mariadbConfig);
+    const controllerSchema = parseSchema(path.join(__dirname, '..\\schemas\\controller_schema.json'));
+    const controller = new Controller(storageVendor, controllerSchema);
+    const gateway = new ExpressGateway(defaultExpressRouteSchema, controller);
+    expressApp = gateway.expressApp;
+    await startInTestEnvironment(storageVendor);
   });
   after(async () => {
-    await storageVendor.shutdown();
+    await stopInTestEnvironment(storageVendor);
   });
   describe('/event', () => {
     describe('GET', () => {
@@ -128,7 +130,7 @@ describe('Express Gateway E2E tests', () => {
       });
     });
     describe('POST', () => {
-      describe('With one or more parameters from \'name\', \'hallId\', \'startingDate\', \'endingDate\' missing', () => {
+      describe('With one or more parameters from \'name\', \'hallId\', \'startsAt\', \'endsAt\' missing', () => {
         it('Responds with error response indicating Invalid Request Error', async () => {
           const response = await request(expressApp)
             .post('/event?id=event-id-3');
@@ -145,7 +147,7 @@ describe('Express Gateway E2E tests', () => {
         describe('When params contain invalid event data', () => {
           it('Responds with error response indicating Invalid Data Error', async () => {
             const response = await request(expressApp)
-              .post('/event?name=event no 4&hallId=hall-id-1&startingDate=2020&endingDate=2019');
+              .post('/event?name=event no 4&hallId=hall-id-1&startsAt=2020&endsAt=2019');
             expect(response.statusCode).to.equal(422);
             expect(response.headers['content-type']).to.include('application/json');
             expect(response.body).to.deep.equal({
@@ -158,7 +160,7 @@ describe('Express Gateway E2E tests', () => {
         describe('When params contain valid event data', () => {
           it('Responds with created event data', async () => {
             const response = await request(expressApp)
-              .post('/event?name=event no 4&hallId=hall-id-1&startingDate=2020&endingDate=2021');
+              .post('/event?name=event no 4&hallId=hall-id-1&startsAt=2020&endsAt=2021');
             expect(response.statusCode).to.equal(200);
             expect(response.headers['content-type']).to.include('application/json');
             expect(response.body).to.nested.include({
@@ -678,7 +680,7 @@ describe('Express Gateway E2E tests', () => {
         describe('When \'eventId\' is set to id of nonexistent event', () => {
           it('Responds with InvalidDataError', async () => {
             const response = await request(expressApp)
-              .post('/ticket?eventId=non-existent-event-id&seatNo=1');
+              .post('/ticket?eventId=non-existent-event-id&seatNumber=1');
 
             expect(response.statusCode).to.equal(404);
             expect(response.headers['content-type']).to.include('application/json');
@@ -691,7 +693,7 @@ describe('Express Gateway E2E tests', () => {
         });
         describe('When \'eventId\' is set to id of closed event', async () => {
           const response = await request(expressApp)
-            .post('/ticket?eventId=event-id-5&seatNo=1');
+            .post('/ticket?eventId=event-id-5&seatNumber=1');
 
           expect(response.statusCode).to.equal(404);
           expect(response.headers['content-type']).to.include('application/json');
@@ -703,7 +705,7 @@ describe('Express Gateway E2E tests', () => {
         });
         describe('When seat with number \'seatNo\' is taken', async () => {
           const response = await request(expressApp)
-            .post('/ticket?eventId=event-id-2&seatNo=2');
+            .post('/ticket?eventId=event-id-2&seatNumber=2');
 
           expect(response.statusCode).to.equal(409);
           expect(response.headers['content-type']).to.include('application/json');
@@ -715,7 +717,7 @@ describe('Express Gateway E2E tests', () => {
         });
         describe('When seat with number \'seatNo\' does not exist', async () => {
           const response = await request(expressApp)
-            .post('/ticket?eventId=event-id-2&seatNo=99');
+            .post('/ticket?eventId=event-id-2&seatNumber=99');
 
           expect(response.statusCode).to.equal(409);
           expect(response.headers['content-type']).to.include('application/json');
@@ -728,7 +730,7 @@ describe('Express Gateway E2E tests', () => {
         describe('When params contain valid ticket data', () => {
           it('Responds with created ticket data', async () => {
             const response = await request(expressApp)
-              .post('/ticket?eventId=event-id-5&seatNo=1');
+              .post('/ticket?eventId=event-id-5&seatNumber=1');
 
             expect(response.statusCode).to.equal(200);
             expect(response.headers['content-type']).to.include('application/json');
