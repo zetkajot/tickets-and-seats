@@ -20,7 +20,7 @@ describe('Internal Error test suite', () => {
     });
     it('logs with level FATAL', () => {
       const logger = new Logger(spiedFormatter, new PassThrough());
-      const testError = InternalError.withLogger(
+      InternalError.withLogger(
         logger,
         InternalErrorSubtype.STORAGE_ERROR,
         new Error(),
@@ -34,7 +34,7 @@ describe('Internal Error test suite', () => {
     });
     it('logs name of underlying error', () => {
       const logger = new Logger(spiedFormatter, new PassThrough());
-      const testError = InternalError.withLogger(
+      InternalError.withLogger(
         logger,
         InternalErrorSubtype.STORAGE_ERROR,
         new Error(),
@@ -44,7 +44,7 @@ describe('Internal Error test suite', () => {
     });
     it('logs message of underlying error', () => {
       const logger = new Logger(spiedFormatter, new PassThrough());
-      const testError = InternalError.withLogger(
+      InternalError.withLogger(
         logger,
         InternalErrorSubtype.STORAGE_ERROR,
         new Error('some msg'),
