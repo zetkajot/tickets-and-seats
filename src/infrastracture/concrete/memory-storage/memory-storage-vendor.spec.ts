@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import { StoredEventData } from '../storage-vendors/event-storage-vendor';
-import { StoredHallData } from '../storage-vendors/hall-storage-vendor';
-import { StoredTicketData } from '../storage-vendors/ticket-storage-vendor';
+import { StoredEventData } from '../../storage-vendors/event-storage-vendor';
+import { StoredHallData } from '../../storage-vendors/hall-storage-vendor';
+import { StoredTicketData } from '../../storage-vendors/ticket-storage-vendor';
 import MemoryStorageVendor from './memory-storage-vendor';
 
 const validEventData: StoredEventData = {
