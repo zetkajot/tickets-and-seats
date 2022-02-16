@@ -1,0 +1,99 @@
+{
+  "actions": {
+    "findOneEvent": {
+      "use-case": "FindEventById",
+      "input-schema": [{
+        "argName": "id",
+        "desiredName": "eventId",
+        "type":"STRING",
+        "required": true
+      }]
+    },
+    "findEvents": {
+      "use-case": "FindEvents",
+      "input-schema": [
+        {"argName": "name", "required": false}, {"argName": "hallId", "required": false}
+      ]
+    },
+    "createEvent": {
+      "use-case": "CreateEvent",
+      "input-schema": [
+        {"argName": "name", "desiredName": "eventName"},
+        {"argName": "hallId"},
+        {"argName": "startsAt", "desiredName": "eventStartingDate", "type": "DATE"},
+        {"argName": "endsAt", "desiredName": "eventEndingDate", "type": "DATE"}
+      ]
+    },
+    "deleteEvent": {
+      "use-case": "DeleteEvent",
+      "input-schema": [
+        {"argName": "id", "desiredName": "eventId"}
+      ]
+    },
+    "openEvent": {
+      "use-case": "OpenEvent",
+      "input-schema": [
+        {"argName": "id", "desiredName": "eventId"}
+      ]
+    },
+    "closeEvent": {
+      "use-case": "CloseEvent",
+      "input-schema": [
+        {"argName": "id", "desiredName": "eventId"}
+      ]
+    },
+    "getEventSeats": {
+      "use-case": "GetSeatsInfo",
+      "input-schema": [
+        {"argName": "id", "desiredName": "eventId"}
+      ]
+    },
+    
+    "findOneHall": {
+      "use-case": "FindHallById",
+      "input-schema": [
+        {"argName": "id", "desiredName": "hallId"}
+      ]
+    },
+    "findHalls": {
+      "use-case": "FindHalls",
+      "input-schema": [
+        {"argName": "name", "required": false}
+      ]
+    },
+    "createHall": {
+      "use-case": "CreateHall",
+      "input-schema": [
+        {"argName": "name", "desiredName": "hallName"},
+        {"argName": "seatLayout", "type": "OBJECT"}
+      ]
+    },
+    "deleteHall": {
+      "use-case": "DeleteHall",
+      "input-schema": [
+        {"argName": "id", "desiredName": "hallId"}
+      ]
+    },
+
+    "issueTicket": {
+      "use-case": "IssueTicket",
+      "input-schema": [
+        {"argName": "eventId"},
+        {"argName": "seatNumber", "desiredName": "seatNo", "type": "NUMBER"}
+      ]
+
+    },
+    "checkTicket": {
+      "use-case": "ValidateTicket",
+      "input-schema": [
+        {"argName": "id", "desiredName": "ticketId"}
+      ]
+    },
+    "cancelTicket": {
+      "use-case": "CancelTicket",
+      "input-schema": [
+        {"argName": "id", "desiredName": "ticketId"}
+      ]
+    }
+  }
+}
