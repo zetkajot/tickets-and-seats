@@ -1,64 +1,139 @@
-import express from 'express';
-import { ControllerRequest } from '../../controllers/types/controller-request';
-import { ControllerResponse } from '../../controllers/types/controller-response';
+import express, { Application, Request, Response } from 'express';
+import { Server } from 'http';
+import Controller from '../../controller/controller';
+import { ActionHandler } from '../../controller/types/action-handler';
+import { ControllerResponse } from '../../controller/types/controller-response';
 import Gateway from '../types/gateway';
-import makeControllerRequest from './make-controller-request';
-import { RouteMapper } from './types/route-mapper';
-import setExpressResponse from './set-express-response';
-import { RouteHandler } from './types/route-handler';
+import { ArgumentExtractor } from './types/argument-extractor';
+import { ExpressRouteSchema } from './types/express-route-schema';
+import getStatusCodeFromError from './types/get-status-code-from-error';
 
 export default class ExpressGateway implements Gateway {
-  public expressApp: express.Express;
+  public readonly expressApp: Application;
 
-  constructor(private routeMapper: RouteMapper) {
+  private expressServer: Server | undefined;
+
+  constructor(schema: ExpressRouteSchema, controller: Controller) {
     this.expressApp = express();
-  }
 
-  addPointOfInteraction(
-    actionName: string,
-    actionHandler: (req: ControllerRequest) => Promise<ControllerResponse>,
-  ): void {
-    const { method, path } = this.routeMapper(actionName);
-
-    const handler = async (req: express.Request, res: express.Response) => {
-      const controllerRequest = makeControllerRequest(req, actionName);
-      const controllerResponse = await actionHandler(controllerRequest);
-      setExpressResponse(res, controllerResponse);
+    const addRouteForMethod = {
+      GET: this.addGetRoute.bind(this),
+      POST: this.addPostRoute.bind(this),
+      DELETE: this.addDeleteRoute.bind(this),
+      PUT: this.addPutRoute.bind(this),
     };
 
-    // eslint-disable-next-line default-case
-    switch (method) {
-      case 'PUT':
-        this.addPutRoute(path, handler);
-        break;
-      case 'DELETE':
-        this.addDeleteRoute(path, handler);
-        break;
-      case 'POST':
-        this.addPostRoute(path, handler);
-        break;
-      case 'GET':
-        this.addGetRoute(path, handler);
-        break;
-      default:
-        throw new Error(`Method ${method} is not supported!`);
-        break;
-    }
+    Object.entries(schema).forEach(([signature, { path, method, argumentExtractor }]) => {
+      const actionHandler = controller.getActionHandler(signature);
+      addRouteForMethod[method](path, argumentExtractor, actionHandler);
+    });
   }
 
-  public addGetRoute(path: string, routeHandler: RouteHandler): void {
-    this.expressApp.get(path, routeHandler);
+  protected addGetRoute(
+    path: string,
+    argumentExtractor: ArgumentExtractor,
+    handler: ActionHandler,
+  ) {
+    this.expressApp.get(
+      path,
+      this.handleHTTPRequest.bind(this, handler, argumentExtractor),
+    );
   }
 
-  public addPostRoute(path: string, routeHandler: RouteHandler): void {
-    this.expressApp.post(path, routeHandler);
+  protected addPostRoute(
+    path: string,
+    argumentExtractor: ArgumentExtractor,
+    handler: ActionHandler,
+  ) {
+    this.expressApp.post(
+      path,
+      this.handleHTTPRequest.bind(this, handler, argumentExtractor),
+    );
   }
 
-  public addDeleteRoute(path: string, routeHandler: RouteHandler): void {
-    this.expressApp.delete(path, routeHandler);
+  protected addPutRoute(
+    path: string,
+    argumentExtractor: ArgumentExtractor,
+    handler: ActionHandler,
+  ) {
+    this.expressApp.put(
+      path,
+      this.handleHTTPRequest.bind(this, handler, argumentExtractor),
+    );
   }
 
-  public addPutRoute(path: string, routeHandler: RouteHandler): void {
-    this.expressApp.put(path, routeHandler);
+  protected addDeleteRoute(
+    path: string,
+    argumentExtractor: ArgumentExtractor,
+    handler: ActionHandler,
+  ) {
+    this.expressApp.delete(
+      path,
+      this.handleHTTPRequest.bind(this, handler, argumentExtractor),
+    );
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async handleHTTPRequest(
+    actionHandler: ActionHandler,
+    argumentExtractor: ArgumentExtractor,
+    request: Request,
+    response: Response,
+  ): Promise<void> {
+    const requestArgs = argumentExtractor(request);
+    const controllerResponse = await actionHandler({ action: 'unused', args: requestArgs });
+    if (controllerResponse.isOk) this.setOkResponse(controllerResponse, response);
+    else this.setErrorResponse(controllerResponse, response);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private setOkResponse(
+    controllerResponse: ControllerResponse,
+    expressResponse: Response,
+  ): void {
+    expressResponse
+      .contentType('application/json');
+    expressResponse
+      .status(200);
+    expressResponse
+      .send(JSON.stringify(controllerResponse));
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  private setErrorResponse(
+    controllerResponse: ControllerResponse,
+    expressResponse: Response,
+  ): void {
+    if (controllerResponse.isOk) throw new Error('Unreachable!');
+    expressResponse
+      .contentType('application/json');
+    expressResponse
+      .status(getStatusCodeFromError(controllerResponse.error));
+    expressResponse
+      .send(JSON.stringify({
+        isOk: false,
+        errorName: controllerResponse.error.name,
+        errorMessage: controllerResponse.error.message,
+      }));
+  }
+
+  open(port: number, hostname = 'localhost'): Promise<void> {
+    return new Promise((resolve) => {
+      this.expressServer = this.expressApp.listen(port, hostname, () => {
+        resolve();
+      });
+    });
+  }
+
+  close(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.expressServer) {
+        this.expressServer.close((error) => {
+          if (error) reject();
+          resolve();
+        });
+      }
+      reject();
+    });
   }
 }

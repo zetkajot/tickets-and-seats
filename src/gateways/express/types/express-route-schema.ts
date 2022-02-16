@@ -1,0 +1,9 @@
+import { ArgumentExtractor } from './argument-extractor';
+
+export type ExpressRouteSchema = {
+  [actionSignature: string]: {
+    method: 'POST' | 'PUT' | 'GET' | 'DELETE',
+    path: string,
+    argumentExtractor: ArgumentExtractor,
+  }
+};
