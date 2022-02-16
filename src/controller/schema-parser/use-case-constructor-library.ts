@@ -1,5 +1,6 @@
 import CloseEvent from '../../use-cases/event/close-event';
 import CreateEvent from '../../use-cases/event/create-event';
+import DeleteEvent from '../../use-cases/event/delete-event';
 import FindEventById from '../../use-cases/event/find-event-by-id';
 import FindEvents from '../../use-cases/event/find-events';
 import GetSeatsInfo from '../../use-cases/event/get-seats-info';
@@ -18,6 +19,7 @@ const useCaseConstructorLibrary = {
   CreateEvent,
   OpenEvent,
   CloseEvent,
+  DeleteEvent,
   GetSeatsInfo,
   FindHallById,
   FindHalls,
