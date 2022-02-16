@@ -1,3 +1,4 @@
+import doubleArrayEntries from '../../../../../utils/double-array-entries';
 import { BuiltQuery } from '../types/built-query';
 import QueryBuilder from '../types/query-builder';
 
@@ -38,17 +39,7 @@ export default class InsertQueryBuilder implements QueryBuilder {
       this.tableName,
       ...this.fieldNames,
       ...this.fieldValues,
-      ...this.doubleArrayEntries(this.fieldNames),
+      ...doubleArrayEntries(this.fieldNames),
     ];
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  private doubleArrayEntries(array: any[]): any[] {
-    const resultingArray = Array(array.length * 2);
-    array.forEach((val, idx) => {
-      resultingArray[idx * 2] = val;
-      resultingArray[idx * 2 + 1] = val;
-    });
-    return resultingArray;
   }
 }

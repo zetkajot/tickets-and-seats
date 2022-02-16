@@ -1,23 +1,11 @@
 import { expect } from 'chai';
 import SelectQueryBuilder from './select-query-builder';
+import countOccurences from '../../../../../utils/count-occurences';
+import setupDummyQuery from './test-utils/setup-dummy-query';
 
-function setupDummyQuery(queryBuilder: SelectQueryBuilder) {
-  queryBuilder.setTableName('DummyTable');
-  queryBuilder.setField('field1', true);
-  queryBuilder.setField('field2', -1);
-  queryBuilder.setField('field3', '50m3/Cr4Z\\Y`/5tr1ng');
-}
 const queryBuilder = new SelectQueryBuilder();
 setupDummyQuery(queryBuilder);
 const builtQuery = queryBuilder.buildQuery();
-
-function countOccurences(baseString: string, regexp: RegExp): number {
-  let occurences = 0;
-  // eslint-disable-next-line no-restricted-syntax, @typescript-eslint/no-unused-vars
-  for (const match of baseString.matchAll(regexp)) occurences += 1;
-
-  return occurences;
-}
 
 describe('SELECT Query Builder test suite', () => {
   describe('In resulting built query', () => {
