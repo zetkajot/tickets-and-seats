@@ -1,6 +1,30 @@
 import { Pool } from 'mariadb';
+import tableSchema from '../table-schema';
 
-export default async function insertDummyData(pool: Pool): Promise<void> {
+const utilityQueries = {
+  InitializeTables: initializeTables,
+  ClearStoredTableData: clearTableData,
+  DropSchemaTables: dropTables,
+  InsertDummyTableData: insertDummyData,
+};
+
+async function initializeTables(pool: Pool) {
+  await pool.query(tableSchema.hall);
+  await pool.query(tableSchema.event);
+  await pool.query(tableSchema.ticket);
+}
+
+async function clearTableData(pool: Pool) {
+  await pool.query('DELETE FROM ticket');
+  await pool.query('DELETE FROM event');
+  await pool.query('DELETE FROM hall');
+}
+
+async function dropTables(pool: Pool) {
+  await pool.query('DROP TABLE IF EXISTS ticket, event, hall;');
+}
+
+async function insertDummyData(pool: Pool): Promise<void> {
   await pool.batch(
     'INSERT INTO hall (id, name, layout) VALUES (?, ?, ?);',
     [
@@ -28,3 +52,5 @@ export default async function insertDummyData(pool: Pool): Promise<void> {
     ],
   );
 }
+
+export default utilityQueries;
