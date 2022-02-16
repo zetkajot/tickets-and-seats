@@ -1,9 +1,9 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import CombinedStorageVendor from '../storage-vendors/combined-storage-vendor';
-import { StoredEventData } from '../storage-vendors/event-storage-vendor';
-import { StoredHallData } from '../storage-vendors/hall-storage-vendor';
-import { StoredTicketData } from '../storage-vendors/ticket-storage-vendor';
+import CombinedStorageVendor from '../../storage-vendors/combined-storage-vendor';
+import { StoredEventData } from '../../storage-vendors/event-storage-vendor';
+import { StoredHallData } from '../../storage-vendors/hall-storage-vendor';
+import { StoredTicketData } from '../../storage-vendors/ticket-storage-vendor';
 
 export default class MemoryStorageVendor implements CombinedStorageVendor {
   constructor(
