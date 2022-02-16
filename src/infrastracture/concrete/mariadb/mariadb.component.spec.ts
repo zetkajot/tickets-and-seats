@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
-import { expect } from 'chai';
+import { expect, use } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import { Pool } from 'mariadb';
 import { StoredEventData } from '../../storage-vendors/event-storage-vendor';
 import { StoredHallData } from '../../storage-vendors/hall-storage-vendor';
@@ -10,6 +11,8 @@ import makeMariaDBStorageVendor from './make-mariadb-storage-vendor';
 import startInTestEnvironment from './utils/start-in-test-environment';
 import stopInTestEnvironment from './utils/stop-in-test-environment';
 import utilityQueries from './utils/utility-queries';
+
+use(chaiAsPromised);
 
 const { mariadbConfig } = ConfigSingleton.getConfig();
 const vendor: MariaDBStorageVendor = makeMariaDBStorageVendor(mariadbConfig);
@@ -171,6 +174,43 @@ describe('MariaDB SV Component test suite', () => {
       });
     });
   });
+  describe('SQL Injection Vulnerability test', () => {
+    beforeEach(async () => {
+      await resetTableContents(vendor.connectionPool);
+    });
+    describe('Exploiting SELECT query', () => {
+      it('OR 1=1 should not work', async () => {
+        const results = await vendor.findEvent({ id: 'not-a-valid-id', hallId: '1\' OR 1=1; # ' });
+        expect(results.length).to.be.equal(0);
+      });
+      it('UNION SELECT should not work', async () => {
+        const maliciousId = 'not-an-id\' UNION SELECT 1, 2, 3 FROM event; # ';
+        const result = await vendor.findTicket({ id: maliciousId });
+        expect(result.length).to.be.equal(0);
+      });
+      it('Orphan apostrophes should not work', () => {
+        const maliciousId = '\'';
+        return expect(vendor.findTicket({ id: maliciousId })).to.eventually.be.fulfilled;
+      });
+    });
+    describe('Exploting DELETE query', () => {
+      it('OR 1=1 should not work', async () => {
+        const maliciousId = 'non-existing-hall-id\' OR 1 = 1; # ';
+        await vendor.deleteHall(maliciousId);
+
+        const deletedData = await vendor.connectionPool.query('SELECT * FROM hall');
+
+        expect(deletedData).to.be.an('array').that.is.not.empty;
+      });
+    });
+    describe('Exploiting INSERT query', () => {
+      it('Orphan apostrophes should not work', () => {
+        const maliciousString = '\'';
+        return expect(vendor.saveHall({ id: maliciousString, layout: [], name: 'some-name' }))
+          .to.eventually.be.fulfilled;
+      });
+    });
+  });
 });
 
 async function getTables(pool: Pool): Promise<string[]> {
@@ -179,6 +219,7 @@ async function getTables(pool: Pool): Promise<string[]> {
 }
 
 async function resetTableContents(pool: Pool): Promise<void> {
+  await utilityQueries.InitializeTables(pool);
   await utilityQueries.ClearStoredTableData(pool);
   await utilityQueries.InsertDummyTableData(pool);
 }
