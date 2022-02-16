@@ -21,23 +21,13 @@ const SpiedMariaDBSV = class extends MariaDBStorageVendor {
     pool: Pool,
     queries: QueryFactories,
     converters: ResultSetConverters,
-    userOptions?: any,
   ) {
-    const options = {
-      dropTablesOnShutdown: false,
-      removeDataOnShutdown: false,
-      removeDataOnStart: false,
-      skipTableInitialization: false,
-      ...userOptions,
-    };
-    const sv = new SpiedMariaDBSV(pool, queries, converters, options);
-    if (!options.skipTableInitialization) {
-      await MariaDBStorageVendor.initializeTables(pool);
-    }
-    if (options.removeDataOnStart) {
-      await MariaDBStorageVendor.clearTableData(pool);
-    }
-    return sv;
+    return new SpiedMariaDBSV(pool, queries, converters);
+  }
+
+  constructor(pool: Pool, queries: QueryFactories, converters: ResultSetConverters) {
+    super({}, queries, converters);
+    this.internalConnectionPool = pool;
   }
 };
 

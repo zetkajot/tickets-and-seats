@@ -1,0 +1,14 @@
+{
+  "actions": {
+    "findEvent": {
+      "use-case": "FindEvent",
+      "input-schema": [
+        {
+          "argName": "id",
+          "desiredName": "eventId",
+          "type": "STRING"
+        }
+      ]
+    }
+  }
+}

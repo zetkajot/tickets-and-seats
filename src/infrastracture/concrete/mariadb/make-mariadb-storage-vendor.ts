@@ -8,40 +8,12 @@ import resultSetToHallData from './result-converters/result-set-to-hall-data';
 import resultSetToTicketData from './result-converters/result-set-to-ticket-data';
 import { QueryFactories } from './types/query-factories';
 import { ResultSetConverters } from './types/result-set-converters';
-import insertDummyData from './utils/insert-dummy-data';
 
-export default async function makeMariaDBStorageVendor(
+export default function makeMariaDBStorageVendor(
   config: PoolConfig,
-  environment: 'TEST' | 'PRODUCTION' = 'PRODUCTION',
-): Promise<MariaDBStorageVendor> {
-  const sv = await MariaDBStorageVendor.init(
-    config,
-    queryFactories,
-    converters,
-    optionsLookup[environment],
-  );
-
-  if (environment === 'TEST') {
-    await insertDummyData(sv.connectionPool);
-  }
-
-  return sv;
+): MariaDBStorageVendor {
+  return new MariaDBStorageVendor(config, queryFactories, converters);
 }
-
-const optionsLookup = {
-  TEST: {
-    dropTablesOnShutdown: true,
-    removeDataOnShutdown: true,
-    removeDataOnStart: true,
-    skipTableInitialization: false,
-  },
-  PRODUCTION: {
-    dropTablesOnShutdown: false,
-    removeDataOnShutdown: false,
-    removeDataOnStart: false,
-    skipTableInitialization: false,
-  },
-};
 
 const queryFactories: QueryFactories = {
   findHall: makeFindQuery.bind(null, 'Hall'),

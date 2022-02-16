@@ -7,15 +7,23 @@ import { StoredTicketData } from '../../storage-vendors/ticket-storage-vendor';
 import MariaDBStorageVendor from './mariadb-storage-vendor';
 import ConfigSingleton from '../../../utils/config-singleton';
 import makeMariaDBStorageVendor from './make-mariadb-storage-vendor';
+import startInTestEnvironment from './utils/start-in-test-environment';
+import stopInTestEnvironment from './utils/stop-in-test-environment';
+import utilityQueries from './utils/utility-queries';
 
 const { mariadbConfig } = ConfigSingleton.getConfig();
+const vendor: MariaDBStorageVendor = makeMariaDBStorageVendor(mariadbConfig);
 
 describe('MariaDB SV Component test suite', () => {
-  let vendor: MariaDBStorageVendor;
+  before(async () => {
+    await startInTestEnvironment(vendor);
+  });
+  after(async () => {
+    await stopInTestEnvironment(vendor);
+  });
   describe('Table schema', () => {
     let tables: string[];
     before(async () => {
-      vendor = await makeMariaDBStorageVendor(mariadbConfig, 'TEST');
       tables = await getTables(vendor.connectionPool);
     });
     it('Has \'event\' table', () => {
@@ -27,16 +35,10 @@ describe('MariaDB SV Component test suite', () => {
     it('Has \'hall\' table', () => {
       expect(tables).to.include('hall');
     });
-    after(async () => {
-      await vendor.shutdown();
-    });
   });
   describe('methods tests', () => {
     beforeEach(async () => {
-      vendor = await makeMariaDBStorageVendor(mariadbConfig, 'TEST');
-    });
-    afterEach(async () => {
-      await vendor.shutdown();
+      await resetTableContents(vendor.connectionPool);
     });
     describe('findHall', () => {
       it('Returns matching data stored in DB', async () => {
@@ -174,4 +176,9 @@ describe('MariaDB SV Component test suite', () => {
 async function getTables(pool: Pool): Promise<string[]> {
   const queryResult = <[{ Tables_in_test: string }]> await pool.query('SHOW TABLES;');
   return queryResult.map((row) => row.Tables_in_test);
+}
+
+async function resetTableContents(pool: Pool): Promise<void> {
+  await utilityQueries.ClearStoredTableData(pool);
+  await utilityQueries.InsertDummyTableData(pool);
 }

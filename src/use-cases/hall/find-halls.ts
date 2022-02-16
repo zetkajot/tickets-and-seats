@@ -1,7 +1,7 @@
 import UseCase from '../use-case';
 
 type Input = {
-  name: string,
+  name?: string,
 };
 type Output = {
   hallId: string,
