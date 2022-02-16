@@ -1,32 +1,39 @@
+import alternateTables from '../../../../../utils/alternate-tables';
 import { BuiltQuery } from '../types/built-query';
 import QueryBuilder from '../types/query-builder';
 
 export default class SelectQueryBuilder implements QueryBuilder {
-  private parameterValues: any[] = [];
+  private fieldNames: string[] = [];
+
+  private fieldValues: string[] = [];
+
+  private tableName: string = '';
 
   setTableName(name: string): void {
-    this.parameterValues[0] = name;
+    this.tableName = name;
   }
 
   setField(name: string, value: any): void {
-    this.parameterValues.push(name, value);
+    this.fieldNames.push(name);
+    this.fieldValues.push(value);
   }
 
   buildQuery(): BuiltQuery {
     return {
-      query: this.buildQueryString(),
-      values: this.parameterValues,
+      query: this.prepareQueryString(),
+      values: this.prepareValues(),
     };
   }
 
-  private buildQueryString(): string {
-    const fieldParams = this.parameterValues.slice(1);
-    const whereClauseParams: string[] = [];
-    fieldParams.reduce((shouldPush) => {
-      if (shouldPush) whereClauseParams.push('?=?');
-      return !shouldPush;
-    }, false);
-    const afterWhereClause = whereClauseParams.join(' AND ');
-    return `SELECT * FROM ?${afterWhereClause.length > 0 ? ` WHERE ${afterWhereClause}` : ''};`;
+  private prepareQueryString(): string {
+    const hasConditions = this.fieldNames.length > 0;
+    return `SELECT * FROM ?${hasConditions ? ` WHERE ${this.fieldNames.map(() => '?=?').join(' AND ')}` : ''};`;
+  }
+
+  private prepareValues(): any[] {
+    return [
+      this.tableName,
+      ...alternateTables(this.fieldNames, this.fieldValues),
+    ];
   }
 }
