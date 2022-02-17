@@ -27,7 +27,7 @@ export default class AppManager {
   async start(port: number) {
     await this.connector.start();
     const storageVendor = new MariaDBStorageVendor(this.connector, new QueryExecutorsFactory());
-    const controllerSchema = parseSchema(path.join(__dirname, 'schemas\\controller_schema.json'));
+    const controllerSchema = parseSchema(path.join(__dirname, 'schemas', 'controller_schema.json'));
     const controller = new Controller(storageVendor, controllerSchema);
     this.gateway = new ExpressGateway(defaultExpressRouteSchema, controller);
     await this.gateway.open(port);
