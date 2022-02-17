@@ -1,30 +1,37 @@
 import request from 'supertest';
 import { expect } from 'chai';
 import path from 'node:path/win32';
-import makeMariaDBStorageVendor from '../infrastracture/concrete/mariadb/make-mariadb-storage-vendor';
 import ConfigSingleton from '../utils/config-singleton';
 import ExpressGateway from './express/expres-gateway';
 import parseSchema from '../controller/schema-parser/parse-schema';
 import MariaDBStorageVendor from '../infrastracture/concrete/mariadb/mariadb-storage-vendor';
 import defaultExpressRouteSchema from '../schemas/default-express-route-schema';
 import Controller from '../controller/controller';
-import startInTestEnvironment from '../infrastracture/concrete/mariadb/utils/start-in-test-environment';
-import stopInTestEnvironment from '../infrastracture/concrete/mariadb/utils/stop-in-test-environment';
+import QueryExecutorsFactory from '../infrastracture/concrete/mariadb/query-executors/query-executors-factory';
+import MariaDBConnector from '../infrastracture/concrete/mariadb/mariadb-connector';
+import setupInTestEnv from '../infrastracture/concrete/mariadb/utils/setup-in-test-env';
+import cleanupInTestEnv from '../infrastracture/concrete/mariadb/utils/cleanup-in-test-env';
 
 let expressApp: Express.Application;
 let storageVendor: MariaDBStorageVendor;
+let connector: MariaDBConnector;
 
 describe('Express Gateway E2E tests', () => {
   before(async () => {
-    storageVendor = makeMariaDBStorageVendor(ConfigSingleton.getConfig().mariadbConfig);
+    connector = new MariaDBConnector(ConfigSingleton.getConfig().mariadbConfig);
+    await connector.start(setupInTestEnv);
+
+    const executorsFactory = new QueryExecutorsFactory();
+    storageVendor = new MariaDBStorageVendor(connector, executorsFactory);
+
     const controllerSchema = parseSchema(path.join(__dirname, '..\\schemas\\controller_schema.json'));
     const controller = new Controller(storageVendor, controllerSchema);
+
     const gateway = new ExpressGateway(defaultExpressRouteSchema, controller);
     expressApp = gateway.expressApp;
-    await startInTestEnvironment(storageVendor);
   });
   after(async () => {
-    await stopInTestEnvironment(storageVendor);
+    await connector.stop(cleanupInTestEnv);
   });
   describe('/event', () => {
     describe('GET', () => {
