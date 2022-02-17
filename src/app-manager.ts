@@ -5,7 +5,7 @@ import ExpressGateway from './gateways/express/expres-gateway';
 import MariaDBConnector from './infrastracture/concrete/mariadb/mariadb-connector';
 import MariaDBStorageVendor from './infrastracture/concrete/mariadb/mariadb-storage-vendor';
 import QueryExecutorsFactory from './infrastracture/concrete/mariadb/query-executors/query-executors-factory';
-import defaultExpressRouteSchema from './schemas/default-express-route-schema';
+import defaultExpressRouteSchema from '../schemas/default-express-route-schema';
 import ConfigSingleton from './utils/config-singleton';
 
 const { mariadbConfig } = ConfigSingleton.getConfig();
@@ -27,7 +27,7 @@ export default class AppManager {
   async start(port: number) {
     await this.connector.start();
     const storageVendor = new MariaDBStorageVendor(this.connector, new QueryExecutorsFactory());
-    const controllerSchema = parseSchema(path.join(__dirname, 'schemas', 'controller_schema.json'));
+    const controllerSchema = parseSchema(path.join(__dirname, `..${path.sep}`, 'schemas', 'controller_schema.json'));
     const controller = new Controller(storageVendor, controllerSchema);
     this.gateway = new ExpressGateway(defaultExpressRouteSchema, controller);
     await this.gateway.open(port);
