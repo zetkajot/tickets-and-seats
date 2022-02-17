@@ -193,16 +193,6 @@ describe('MariaDB SV Component test suite', () => {
         return expect(vendor.findTicket({ id: maliciousId })).to.eventually.be.fulfilled;
       });
     });
-    describe('Exploting DELETE query', () => {
-      it('OR 1=1 should not work', async () => {
-        const maliciousId = 'non-existing-hall-id\' OR 1 = 1; # ';
-        await vendor.deleteHall(maliciousId);
-
-        const deletedData = await vendor.connectionPool.query('SELECT * FROM hall');
-
-        expect(deletedData).to.be.an('array').that.is.not.empty;
-      });
-    });
     describe('Exploiting INSERT query', () => {
       it('Orphan apostrophes should not work', () => {
         const maliciousString = '\'';
