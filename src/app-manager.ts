@@ -2,24 +2,21 @@ import path from 'path';
 import Controller from './controller/controller';
 import parseSchema from './controller/schema-parser/parse-schema';
 import ExpressGateway from './gateways/express/expres-gateway';
-import makeMariaDBStorageVendor from './infrastracture/concrete/mariadb/make-mariadb-storage-vendor';
+import MariaDBConnector from './infrastracture/concrete/mariadb/mariadb-connector';
 import MariaDBStorageVendor from './infrastracture/concrete/mariadb/mariadb-storage-vendor';
+import QueryExecutorsFactory from './infrastracture/concrete/mariadb/query-executors/query-executors-factory';
 import defaultExpressRouteSchema from './schemas/default-express-route-schema';
 import ConfigSingleton from './utils/config-singleton';
 
 const { mariadbConfig } = ConfigSingleton.getConfig();
 
 export default class AppManager {
-  private storageVendor: MariaDBStorageVendor;
+  private connector: MariaDBConnector;
 
-  private gateway: ExpressGateway;
+  private gateway: ExpressGateway | undefined;
 
   constructor() {
-    this.storageVendor = makeMariaDBStorageVendor(mariadbConfig);
-    const controllerSchema = parseSchema(path.join(__dirname, 'schemas\\controller_schema.json'));
-    const controller = new Controller(this.storageVendor, controllerSchema);
-    this.gateway = new ExpressGateway(defaultExpressRouteSchema, controller);
-
+    this.connector = new MariaDBConnector(mariadbConfig);
     this.bindSIGINT();
   }
 
@@ -28,12 +25,16 @@ export default class AppManager {
   }
 
   async start(port: number) {
-    await this.storageVendor.start();
+    await this.connector.start();
+    const storageVendor = new MariaDBStorageVendor(this.connector, new QueryExecutorsFactory());
+    const controllerSchema = parseSchema(path.join(__dirname, 'schemas\\controller_schema.json'));
+    const controller = new Controller(storageVendor, controllerSchema);
+    this.gateway = new ExpressGateway(defaultExpressRouteSchema, controller);
     await this.gateway.open(port);
   }
 
   async stop() {
-    await this.gateway.close();
-    await this.storageVendor.stop();
+    await (this.gateway as ExpressGateway).close();
+    await this.connector.stop();
   }
 }
