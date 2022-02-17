@@ -5,7 +5,7 @@ import ExpressGateway from './gateways/express/expres-gateway';
 import MariaDBConnector from './infrastracture/concrete/mariadb/mariadb-connector';
 import MariaDBStorageVendor from './infrastracture/concrete/mariadb/mariadb-storage-vendor';
 import QueryExecutorsFactory from './infrastracture/concrete/mariadb/query-executors/query-executors-factory';
-import defaultExpressRouteSchema from '../schemas/default-express-route-schema';
+import defaultExpressRouteSchema from './schemas/default-express-route-schema';
 import ConfigSingleton from './utils/config-singleton';
 
 const { mariadbConfig } = ConfigSingleton.getConfig();
