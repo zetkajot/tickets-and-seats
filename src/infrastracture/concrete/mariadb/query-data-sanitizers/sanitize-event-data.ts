@@ -1,7 +1,7 @@
 import { StoredEventData } from '../../../storage-vendors/event-storage-vendor';
 
 export default function sanitizeEventData(data: Partial<StoredEventData>): Record<string, any> {
-  const sanitizedData: Record<string, any> = data;
+  const sanitizedData: Record<string, any> = { ...data };
   Object.entries(data).forEach(([name, value]) => {
     if (name === 'startsAt') sanitizedData.startsAt = (value as Date).getTime();
     if (name === 'endsAt') sanitizedData.endsAt = (value as Date).getTime();
