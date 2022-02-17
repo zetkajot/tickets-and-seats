@@ -7,27 +7,31 @@ import { StoredHallData } from '../../storage-vendors/hall-storage-vendor';
 import { StoredTicketData } from '../../storage-vendors/ticket-storage-vendor';
 import MariaDBStorageVendor from './mariadb-storage-vendor';
 import ConfigSingleton from '../../../utils/config-singleton';
-import makeMariaDBStorageVendor from './make-mariadb-storage-vendor';
-import startInTestEnvironment from './utils/start-in-test-environment';
-import stopInTestEnvironment from './utils/stop-in-test-environment';
 import utilityQueries from './utils/utility-queries';
+import MariaDBConnector from './mariadb-connector';
+import QueryExecutorsFactory from './query-executors/query-executors-factory';
+import setupInTestEnv from './utils/setup-in-test-env';
+import cleanupInTestEnv from './utils/cleanup-in-test-env';
 
 use(chaiAsPromised);
 
 const { mariadbConfig } = ConfigSingleton.getConfig();
-const vendor: MariaDBStorageVendor = makeMariaDBStorageVendor(mariadbConfig);
+const connector = new MariaDBConnector(mariadbConfig);
+const executorsFactory = new QueryExecutorsFactory();
+let vendor: MariaDBStorageVendor;
 
 describe('MariaDB SV Component test suite', () => {
   before(async () => {
-    await startInTestEnvironment(vendor);
+    await connector.start(setupInTestEnv);
+    vendor = new MariaDBStorageVendor(connector, executorsFactory);
   });
   after(async () => {
-    await stopInTestEnvironment(vendor);
+    await connector.stop(cleanupInTestEnv);
   });
   describe('Table schema', () => {
     let tables: string[];
     before(async () => {
-      tables = await getTables(vendor.connectionPool);
+      tables = await getTables(connector.connectionPool);
     });
     it('Has \'event\' table', () => {
       expect(tables).to.include('event');
@@ -41,7 +45,7 @@ describe('MariaDB SV Component test suite', () => {
   });
   describe('methods tests', () => {
     beforeEach(async () => {
-      await resetTableContents(vendor.connectionPool);
+      await resetTableContents(connector.connectionPool);
     });
     describe('findHall', () => {
       it('Returns matching data stored in DB', async () => {
@@ -93,7 +97,7 @@ describe('MariaDB SV Component test suite', () => {
           layout: [[3, 13, 12], [293, 23, 184]],
         };
         await vendor.saveHall(hallData);
-        const savedData = await vendor.connectionPool.query('SELECT * FROM hall WHERE id = \'hall-id-4\';');
+        const savedData = await connector.connectionPool.query('SELECT * FROM hall WHERE id = \'hall-id-4\';');
         expect(savedData[0]).to.deep.equal({
           id: 'hall-id-4',
           name: 'my precious hall',
@@ -114,7 +118,7 @@ describe('MariaDB SV Component test suite', () => {
         };
         await vendor.saveEvent(eventData);
 
-        const savedData = await vendor.connectionPool.query('SELECT * FROM event WHERE id = \'event-id-4\';');
+        const savedData = await connector.connectionPool.query('SELECT * FROM event WHERE id = \'event-id-4\';');
 
         expect(savedData[0]).to.deep.equal({
           id: eventData.id,
@@ -137,7 +141,7 @@ describe('MariaDB SV Component test suite', () => {
 
         await vendor.saveTicket(ticketData);
 
-        const savedData = await vendor.connectionPool.query('SELECT * FROM ticket WHERE id = \'ticket-id-19\';');
+        const savedData = await connector.connectionPool.query('SELECT * FROM ticket WHERE id = \'ticket-id-19\';');
 
         expect(savedData[0]).to.deep.equal({
           id: 'ticket-id-19',
@@ -150,7 +154,7 @@ describe('MariaDB SV Component test suite', () => {
       it('Removes matching data from db', async () => {
         await vendor.deleteHall('hall-id-2');
 
-        const deletedData = await vendor.connectionPool.query('SELECT * FROM hall WHERE id = \'hall-id-2\'');
+        const deletedData = await connector.connectionPool.query('SELECT * FROM hall WHERE id = \'hall-id-2\'');
 
         expect(deletedData).to.be.an('array').that.is.empty;
       });
@@ -159,7 +163,7 @@ describe('MariaDB SV Component test suite', () => {
       it('Removes matching data from db', async () => {
         await vendor.deleteEvent('event-id-1');
 
-        const deletedData = await vendor.connectionPool.query('SELECT * FROM hall WHERE id = \'event-id-1\'');
+        const deletedData = await connector.connectionPool.query('SELECT * FROM hall WHERE id = \'event-id-1\'');
 
         expect(deletedData).to.be.an('array').that.is.empty;
       });
@@ -168,7 +172,7 @@ describe('MariaDB SV Component test suite', () => {
       it('Removes matching data from db', async () => {
         await vendor.deleteTicket('ticket-id-1');
 
-        const deletedData = await vendor.connectionPool.query('SELECT * FROM hall WHERE id = \'ticket-id-1\'');
+        const deletedData = await connector.connectionPool.query('SELECT * FROM hall WHERE id = \'ticket-id-1\'');
 
         expect(deletedData).to.be.an('array').that.is.empty;
       });
@@ -176,7 +180,7 @@ describe('MariaDB SV Component test suite', () => {
   });
   describe('SQL Injection Vulnerability test', () => {
     beforeEach(async () => {
-      await resetTableContents(vendor.connectionPool);
+      await resetTableContents(connector.connectionPool);
     });
     describe('Exploiting SELECT query', () => {
       it('OR 1=1 should not work', async () => {

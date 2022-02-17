@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { Pool } from 'mariadb';
 import DeleteQueryBuilder from '../query-creator/concrete-builders/delete-query-builder';
 import InsertQueryBuilder from '../query-creator/concrete-builders/insert-query-builder';
@@ -16,32 +17,30 @@ import { QueryCreators } from './types/query-creators';
 import { TicketQueryExecutor } from './types/ticket-query-executor';
 
 export default class QueryExecutorsFactory {
-  constructor(private pool: Pool) {}
-
-  makeEventQueryExecutor(): EventQueryExecutor {
+  makeEventQueryExecutor(pool: Pool): EventQueryExecutor {
     return new QueryExecutor(
       'event',
-      this.pool,
+      pool,
       queryCreators,
       sanitizeEventData,
       resultSetToEventData,
     );
   }
 
-  makeTicketQueryExecutor(): TicketQueryExecutor {
+  makeTicketQueryExecutor(pool: Pool): TicketQueryExecutor {
     return new QueryExecutor(
       'ticket',
-      this.pool,
+      pool,
       queryCreators,
       sanitizeTicketData,
       resultSetToTicketData,
     );
   }
 
-  makeHallQueryExecutor(): HallQueryExecutor {
+  makeHallQueryExecutor(pool: Pool): HallQueryExecutor {
     return new QueryExecutor(
       'hall',
-      this.pool,
+      pool,
       queryCreators,
       sanitizeHallData,
       resultSetToHallData,
