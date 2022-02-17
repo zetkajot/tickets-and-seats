@@ -5,25 +5,36 @@ import CombinedStorageVendor from '../../storage-vendors/combined-storage-vendor
 import { StoredEventData } from '../../storage-vendors/event-storage-vendor';
 import { StoredHallData } from '../../storage-vendors/hall-storage-vendor';
 import { StoredTicketData } from '../../storage-vendors/ticket-storage-vendor';
+import DeleteQueryBuilder from './query-creator/concrete-builders/delete-query-builder';
+import InsertQueryBuilder from './query-creator/concrete-builders/insert-query-builder';
+import SelectQueryBuilder from './query-creator/concrete-builders/select-query-builder';
+import QueryCreationDirector from './query-creator/query-creation-director';
 import { QueryFactories } from './types/query-factories';
 import { ResultSetConverters } from './types/result-set-converters';
 import utilityQueries from './utils/utility-queries';
 
 export default class MariaDBStorageVendor implements CombinedStorageVendor {
-  private startCounter = 0;
-
   protected internalConnectionPool: Pool;
+
+  private selectQueryCreator: QueryCreationDirector;
+
+  private deleteQueryCreator: QueryCreationDirector;
+
+  private insertQueryCreator: QueryCreationDirector;
 
   public get connectionPool() {
     return this.internalConnectionPool;
   }
 
   constructor(
-    private config: PoolConfig,
+    config: PoolConfig,
     private queries: QueryFactories,
     private converters: ResultSetConverters,
   ) {
     this.internalConnectionPool = createPool(config);
+    this.selectQueryCreator = new QueryCreationDirector(new SelectQueryBuilder());
+    this.deleteQueryCreator = new QueryCreationDirector(new DeleteQueryBuilder());
+    this.insertQueryCreator = new QueryCreationDirector(new InsertQueryBuilder());
   }
 
   public async start(
@@ -33,7 +44,6 @@ export default class MariaDBStorageVendor implements CombinedStorageVendor {
     if (afterStart) {
       await afterStart(this.internalConnectionPool);
     }
-    this.startCounter += 1;
   }
 
   public async stop(beforeStop?: (pool: Pool) => Promise<void>): Promise<void> {
@@ -44,70 +54,88 @@ export default class MariaDBStorageVendor implements CombinedStorageVendor {
   }
 
   async saveEvent(data: StoredEventData): Promise<void> {
-    const query = this.queries.saveEvent(data);
-    const queryResult = await this.internalConnectionPool.query(query);
+    const safeEventData = {
+      ...data,
+      startsAt: data.startsAt.getTime(),
+      endsAt: data.endsAt.getTime(),
+      reservedSeats: JSON.stringify(data.reservedSeats),
+    };
+    const { query, values } = this.insertQueryCreator.createQuery('event', safeEventData);
+    const queryResult = await this.internalConnectionPool.query(query, values);
     if (queryResult.affectedRows === 0) {
       throw new StorageError();
     }
   }
 
   async findEvent(data: Partial<Pick<StoredEventData, 'id' | 'name' | 'hallId'>>): Promise<StoredEventData[]> {
-    const query = this.queries.findEvent(data);
-    const resultSet = await this.internalConnectionPool.query(query);
+    const safeData = data;
+    Object.entries(safeData)
+      .filter(([, value]) => value === undefined)
+      .forEach(([name]) => delete safeData[name as keyof typeof safeData]);
+    const { query, values } = this.selectQueryCreator.createQuery('event', safeData);
+    const resultSet = await this.internalConnectionPool.query(query, values);
     const eventDataSet = this.converters.toEventDataSet(resultSet);
     return eventDataSet;
   }
 
   async deleteEvent(eventId: string): Promise<void> {
-    const query = this.queries.deleteEvent({ id: eventId });
-    const queryResult = await this.internalConnectionPool.query(query);
+    const { query, values } = this.deleteQueryCreator.createQuery('event', { id: eventId });
+    const queryResult = await this.internalConnectionPool.query(query, values);
     if (queryResult.affectedRows === 0) {
       throw new StorageError();
     }
   }
 
   async saveHall(data: StoredHallData): Promise<void> {
-    const query = this.queries.saveHall(data);
-    const queryResult = await this.internalConnectionPool.query(query);
+    const safeHallData = {
+      ...data,
+      layout: JSON.stringify(data.layout),
+    };
+    const { query, values } = this.insertQueryCreator.createQuery('hall', safeHallData);
+    const queryResult = await this.internalConnectionPool.query(query, values);
     if (queryResult.affectedRows === 0) {
       throw new StorageError();
     }
   }
 
   async deleteHall(hallId: string): Promise<void> {
-    const query = this.queries.deleteHall({ id: hallId });
-    const queryResult = await this.internalConnectionPool.query(query);
+    const { query, values } = this.deleteQueryCreator.createQuery('hall', { id: hallId });
+    const queryResult = await this.internalConnectionPool.query(query, values);
     if (queryResult.affectedRows === 0) {
       throw new StorageError();
     }
   }
 
   async saveTicket(data: StoredTicketData): Promise<void> {
-    const query = this.queries.saveTicket(data);
-    const queryResult = await this.internalConnectionPool.query(query);
+    const { query, values } = this.insertQueryCreator.createQuery('ticket', data);
+    const queryResult = await this.internalConnectionPool.query(query, values);
     if (queryResult.affectedRows === 0) {
       throw new StorageError();
     }
   }
 
   async findTicket(data: Partial<StoredTicketData>): Promise<StoredTicketData[]> {
-    const query = this.queries.findTicket(data);
-    const resultSet = await this.internalConnectionPool.query(query);
+    const { query, values } = this.selectQueryCreator.createQuery('ticket', data);
+    const resultSet = await this.internalConnectionPool.query(query, values);
     const ticketDataSet = this.converters.toTicketDataSet(resultSet);
     return ticketDataSet;
   }
 
   async deleteTicket(ticketId: string): Promise<void> {
-    const query = this.queries.deleteTicket({ id: ticketId });
-    const queryResult = await this.internalConnectionPool.query(query);
+    const { query, values } = this.deleteQueryCreator.createQuery('ticket', { id: ticketId });
+    const queryResult = await this.internalConnectionPool.query(query, values);
     if (queryResult.affectedRows === 0) {
       throw new StorageError();
     }
   }
 
   async findHall(data: Partial<Omit<StoredHallData, 'layout'>>): Promise<StoredHallData[]> {
-    const query = this.queries.findHall(data);
-    const resultSet = await this.internalConnectionPool.query(query);
+    const safeData = data;
+    Object.entries(safeData)
+      .filter(([, value]) => value === undefined)
+      .forEach(([name]) => delete safeData[name as keyof typeof safeData]);
+    const { query, values } = this.selectQueryCreator.createQuery('hall', data);
+    const resultSet = await this.internalConnectionPool.query(query, values);
     const hallDataSet = this.converters.toHallDataSet(resultSet);
     return hallDataSet;
   }
