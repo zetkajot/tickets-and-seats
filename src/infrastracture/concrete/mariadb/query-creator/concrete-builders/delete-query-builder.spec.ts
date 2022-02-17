@@ -11,31 +11,30 @@ describe('DELETE Query Builder test suite', () => {
   describe('In resulting built query', () => {
     describe('query', () => {
       it('query has valid structure', () => {
-        expect(builtQuery.query).to.match(/^DELETE FROM \?( WHERE \?=\?( AND \?=\?)*)?;$/);
+        expect(builtQuery.query).to.match(/^DELETE FROM [a-zA-Z0-9-]+( WHERE [a-zA-Z0-9-]+=\?( AND [a-zA-Z0-9-]+=\?)*)?;$/);
       });
       describe('When at least one field was set', () => {
         it('there are as much parameters following WHERE clause as there were fields set', () => {
-          expect(countOccurences(builtQuery.query, /\?=\?/g)).to.equal(3);
+          expect(countOccurences(builtQuery.query, /[a-zA-Z0-9-]+=\?/g)).to.equal(3);
         });
       });
       describe('When no fields were set', () => {
         it('there is no WHERE clause and following it parameters', () => {
           const otherQueryBuilder = new DeleteQueryBuilder();
-          otherQueryBuilder.setTableName('some-table');
+          otherQueryBuilder.setTableName('someTable');
           const otherBuiltQuery = otherQueryBuilder.buildQuery();
 
-          expect(otherBuiltQuery.query).to.equal('DELETE FROM ?;');
+          expect(otherBuiltQuery.query).to.equal('DELETE FROM someTable;');
         });
+      });
+      it('table name is set', () => {
+        expect(builtQuery.query).to.match(/^DELETE FROM DummyTable/);
       });
     });
 
-    it('values\' first element is set table name', () => {
-      expect(builtQuery.values[0]).to.equal('DummyTable');
-    });
-
     it('values contains all set field names and values in correct order', () => {
-      expect(builtQuery.values.slice(1)).to.deep.equal(
-        ['field1', true, 'field2', -1, 'field3', '50m3/Cr4Z\\Y`/5tr1ng'],
+      expect(builtQuery.values).to.deep.equal(
+        [true, -1, '50m3/Cr4Z\\Y`/5tr1ng'],
       );
     });
   });

@@ -1,4 +1,3 @@
-import doubleArrayEntries from '../../../../../utils/double-array-entries';
 import { BuiltQuery } from '../types/built-query';
 import QueryBuilder from '../types/query-builder';
 
@@ -30,22 +29,14 @@ export default class InsertQueryBuilder implements QueryBuilder {
     }
     return {
       query: this.prepareQueryString(),
-      values: this.prepareValues(),
+      values: this.fieldValues,
     };
   }
 
   private prepareQueryString(): string {
-    const parenthesisedParams = this.fieldNames.map(() => '?').join(', ');
-    const updateParams = this.fieldNames.map(() => '? = VALUES(?)').join(', ');
-    return `INSERT INTO ? (${parenthesisedParams}) VALUES (${parenthesisedParams}) ON DUPLICATE KEY UPDATE ${updateParams};`;
-  }
-
-  private prepareValues(): any[] {
-    return [
-      this.tableName,
-      ...this.fieldNames,
-      ...this.fieldValues,
-      ...doubleArrayEntries(this.fieldNames),
-    ];
+    const names = this.fieldNames.map((name) => name).join(', ');
+    const values = this.fieldNames.map(() => '?').join(', ');
+    const updateParams = this.fieldNames.map((name) => `${name} = VALUES(${name})`).join(', ');
+    return `INSERT INTO ${this.tableName} (${names}) VALUES (${values}) ON DUPLICATE KEY UPDATE ${updateParams};`;
   }
 }

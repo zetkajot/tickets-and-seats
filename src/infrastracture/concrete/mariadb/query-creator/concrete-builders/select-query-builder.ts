@@ -1,4 +1,3 @@
-import alternateTables from '../../../../../utils/alternate-tables';
 import { BuiltQuery } from '../types/built-query';
 import QueryBuilder from '../types/query-builder';
 
@@ -27,19 +26,12 @@ export default class SelectQueryBuilder implements QueryBuilder {
   buildQuery(): BuiltQuery {
     return {
       query: this.prepareQueryString(),
-      values: this.prepareValues(),
+      values: this.fieldValues,
     };
   }
 
   private prepareQueryString(): string {
     const hasConditions = this.fieldNames.length > 0;
-    return `SELECT * FROM ?${hasConditions ? ` WHERE ${this.fieldNames.map(() => '?=?').join(' AND ')}` : ''};`;
-  }
-
-  private prepareValues(): any[] {
-    return [
-      this.tableName,
-      ...alternateTables(this.fieldNames, this.fieldValues),
-    ];
+    return `SELECT * FROM ${this.tableName}${hasConditions ? ` WHERE ${this.fieldNames.map((name) => `${name}=?`).join(' AND ')}` : ''};`;
   }
 }
