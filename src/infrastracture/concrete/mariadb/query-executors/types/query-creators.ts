@@ -1,4 +1,4 @@
-import QueryCreationDirector from '../query-creator/query-creation-director';
+import QueryCreationDirector from '../../query-creator/query-creation-director';
 
 export type QueryCreators = {
   selectQueryCreator: QueryCreationDirector,

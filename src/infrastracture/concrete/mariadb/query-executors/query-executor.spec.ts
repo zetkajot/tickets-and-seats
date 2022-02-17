@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import { Pool } from 'mariadb';
 import Sinon, { SinonSpy } from 'sinon';
-import ExecutorTemplate from './executor-template';
-import { QueryCreators } from './query-creators';
+import QueryExectuor from './query-executor';
+import { QueryCreators } from './types/query-creators';
 
 const fakeTableName = 'SomeTable';
 const spiedSelectPool = { query: Sinon.spy(async () => ({ result: '1' })) } as unknown as Pool;
@@ -20,19 +20,19 @@ const spiedQueryCreators = {
 const spiedDataSanitizer = Sinon.spy(() => ({ sanitized: true }));
 const spiedQueryResultConverter = Sinon.spy(() => ({ converted: true }));
 
-describe('Executor Template test suite', () => {
-  let spiedExecutorTemplate: ExecutorTemplate<any, any, any>;
+describe('Query Executor test suite', () => {
+  let spiedQueryExectuor: QueryExectuor<any, any, any>;
   describe('When executing select query', () => {
     before(async () => {
       Sinon.reset();
-      spiedExecutorTemplate = new ExecutorTemplate(
+      spiedQueryExectuor = new QueryExectuor(
         fakeTableName,
         spiedSelectPool,
         spiedQueryCreators,
         spiedDataSanitizer,
         spiedQueryResultConverter,
       );
-      await spiedExecutorTemplate.executeSelectQuery({ fake: true });
+      await spiedQueryExectuor.executeSelectQuery({ fake: true });
     });
     it('Should sanitize given data first', () => {
       expect(spiedDataSanitizer).to.have.been.calledOnceWithExactly({ fake: true });
@@ -58,14 +58,14 @@ describe('Executor Template test suite', () => {
   describe('When executing insert query', () => {
     before(async () => {
       Sinon.reset();
-      spiedExecutorTemplate = new ExecutorTemplate(
+      spiedQueryExectuor = new QueryExectuor(
         fakeTableName,
         spiedAffectingPool,
         spiedQueryCreators,
         spiedDataSanitizer,
         spiedQueryResultConverter,
       );
-      await spiedExecutorTemplate.executeInsertQuery({ fake: true });
+      await spiedQueryExectuor.executeInsertQuery({ fake: true });
     });
     it('Should sanitize given data first', () => {
       expect(spiedDataSanitizer).to.have.been.calledOnceWithExactly({ fake: true });
@@ -83,13 +83,13 @@ describe('Executor Template test suite', () => {
         );
     });
     describe('When at least one row was affected by query', () => {
-      it('Should not throw', () => expect(spiedExecutorTemplate.executeInsertQuery({ fake: true }))
+      it('Should not throw', () => expect(spiedQueryExectuor.executeInsertQuery({ fake: true }))
         .to.eventually.be.fulfilled);
     });
     describe('When no rows were affected by query', () => {
       before(async () => {
         Sinon.reset();
-        spiedExecutorTemplate = new ExecutorTemplate(
+        spiedQueryExectuor = new QueryExectuor(
           fakeTableName,
           spiedNonAffectingPool,
           spiedQueryCreators,
@@ -97,21 +97,21 @@ describe('Executor Template test suite', () => {
           spiedQueryResultConverter,
         );
       });
-      it('Should throw an error', () => expect(spiedExecutorTemplate.executeInsertQuery({ fake: true }))
+      it('Should throw an error', () => expect(spiedQueryExectuor.executeInsertQuery({ fake: true }))
         .to.eventually.be.rejected);
     });
   });
   describe('When executing delete query', () => {
     before(async () => {
       Sinon.reset();
-      spiedExecutorTemplate = new ExecutorTemplate(
+      spiedQueryExectuor = new QueryExectuor(
         fakeTableName,
         spiedAffectingPool,
         spiedQueryCreators,
         spiedDataSanitizer,
         spiedQueryResultConverter,
       );
-      await spiedExecutorTemplate.executeDeleteQuery({ fake: true });
+      await spiedQueryExectuor.executeDeleteQuery({ fake: true });
     });
     it('Should sanitize given data first', () => {
       expect(spiedDataSanitizer).to.have.been.calledOnceWithExactly({ fake: true });
@@ -129,13 +129,13 @@ describe('Executor Template test suite', () => {
         );
     });
     describe('When at least one row was affected by query', () => {
-      it('Should not throw', () => expect(spiedExecutorTemplate.executeDeleteQuery({ fake: true }))
+      it('Should not throw', () => expect(spiedQueryExectuor.executeDeleteQuery({ fake: true }))
         .to.eventually.be.fulfilled);
     });
     describe('When no rows were affected by query', () => {
       before(async () => {
         Sinon.reset();
-        spiedExecutorTemplate = new ExecutorTemplate(
+        spiedQueryExectuor = new QueryExectuor(
           fakeTableName,
           spiedNonAffectingPool,
           spiedQueryCreators,
@@ -143,7 +143,7 @@ describe('Executor Template test suite', () => {
           spiedQueryResultConverter,
         );
       });
-      it('Should throw an error', () => expect(spiedExecutorTemplate.executeDeleteQuery({ fake: true }))
+      it('Should throw an error', () => expect(spiedQueryExectuor.executeDeleteQuery({ fake: true }))
         .to.eventually.be.rejected);
     });
   });

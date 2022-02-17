@@ -1,8 +1,8 @@
 import { Pool } from 'mariadb';
 import StorageError from '../../../errors/storage-error';
-import { QueryCreators } from './query-creators';
+import { QueryCreators } from './types/query-creators';
 
-export default class ExecutorTemplate<QueryData, QueryResult, QueryOutput> {
+export default class QueryExecutor<QueryData, QueryResult, QueryOutput> {
   constructor(
     private entityTableName: string,
     private connectionPool: Pool,
