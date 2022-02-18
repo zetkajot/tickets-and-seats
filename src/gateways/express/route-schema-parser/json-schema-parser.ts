@@ -27,7 +27,6 @@ export default class JSONSchemaParser<T> {
       throw new ParserError();
     }
     this.change(parsedJSON);
-    console.log(inspect(parsedJSON, false, 4));
     return parsedJSON as unknown as T;
   }
 
