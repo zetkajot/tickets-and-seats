@@ -1,3 +1,1 @@
-import { ParserUtilityFunction } from './parser-utility-function';
-
-export type ParserAllowedValues = ParserUtilityFunction;
+export type ParserAllowedValue = (target: any) => boolean;

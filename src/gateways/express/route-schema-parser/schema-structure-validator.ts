@@ -1,9 +1,9 @@
 import { JSONParserSchema } from './types/json-parser-schema';
-import { ParserAllowedValues } from './types/parser-allowed-values';
+import { ParserAllowedValue } from './types/parser-allowed-values';
 import flattenStructure from './utils/flatten-structure';
 
 export default class SchemaStructureValidator {
-  private flatSchema: Map<string, ParserAllowedValues>;
+  private flatSchema: Map<string, ParserAllowedValue>;
 
   constructor(schema: JSONParserSchema) {
     this.flatSchema = flattenStructure(schema);

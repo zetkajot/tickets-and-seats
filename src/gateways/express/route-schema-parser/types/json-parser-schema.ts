@@ -1,5 +1,5 @@
-import { ParserAllowedValues } from './parser-allowed-values';
+import { ParserAllowedValue } from './parser-allowed-values';
 
 export type JSONParserSchema = {
-  [k: string]: ParserAllowedValues | JSONParserSchema;
+  [k: string]: ParserAllowedValue | JSONParserSchema;
 };
