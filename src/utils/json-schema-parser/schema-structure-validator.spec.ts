@@ -1,40 +1,74 @@
 import { expect } from 'chai';
 import ParserType from './parser-type';
-import { exactValue } from './parser-utility-functions';
+import { array, exactValue } from './parser-utility-functions';
 import { JSONParserSchema } from './types/json-parser-schema';
 import SchemaStructureValidator from './schema-structure-validator';
 
-const exampleJSONSchema: JSONParserSchema = {
+const exampleSimpleJSONSchema: JSONParserSchema = {
   param1: ParserType.NUMBER,
   param2: exactValue(true),
 };
 
-const validSchema = {
+const validSimpleSchema = {
   param1: 1234,
   param2: true,
 };
-const invalidSchema = {
+const invalidSimpleSchema = {
   param1: true,
   param2: true,
 };
 
+const exampleNestedJSONSchema: JSONParserSchema = {
+  param1: ParserType.STRING,
+  param2: array({
+    nestedParam1: ParserType.NUMBER,
+  }),
+};
+
+const validNestedSchema = {
+  param1: 'some string',
+  param2: [
+    { nestedParam1: 1 },
+    { nestedParam1: 2 },
+    { nestedParam1: 3 },
+  ],
+};
+const invalidNestedSchema = {
+  param1: 'some string',
+  param2: [
+    { nestedParam1: 1 },
+    { nestedParam1: 2 },
+    { nestedParam1: 'three' },
+  ],
+};
+
 describe('Schema Structure Validator test suite', () => {
-  describe('When testing valid schema', () => {
-    it('Should return true', () => {
-      const validator = new SchemaStructureValidator(exampleJSONSchema);
+  it('Should recognize simple valid schemas', () => {
+    const validator = new SchemaStructureValidator(exampleSimpleJSONSchema);
 
-      const validationResult = validator.isStructurallyValid(validSchema);
+    const validationResult = validator.isStructurallyValid(validSimpleSchema);
 
-      expect(validationResult).to.equal(true);
-    });
+    expect(validationResult).to.equal(true);
   });
-  describe('When testing invalid schema', () => {
-    it('Should return false', () => {
-      const validator = new SchemaStructureValidator(exampleJSONSchema);
+  it('Should recognize simple invalid schemas', () => {
+    const validator = new SchemaStructureValidator(exampleSimpleJSONSchema);
 
-      const validationResult = validator.isStructurallyValid(invalidSchema);
+    const validationResult = validator.isStructurallyValid(invalidSimpleSchema);
 
-      expect(validationResult).to.equal(false);
-    });
+    expect(validationResult).to.equal(false);
+  });
+  it('Should recognize nested invalid schemas', () => {
+    const validator = new SchemaStructureValidator(exampleNestedJSONSchema);
+
+    const validationResult = validator.isStructurallyValid(invalidNestedSchema);
+
+    expect(validationResult).to.equal(false);
+  });
+  it('Should recognize nested valid schemas', () => {
+    const validator = new SchemaStructureValidator(exampleNestedJSONSchema);
+
+    const validationResult = validator.isStructurallyValid(validNestedSchema);
+
+    expect(validationResult).to.equal(true);
   });
 });
