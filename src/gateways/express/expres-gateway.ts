@@ -82,11 +82,8 @@ export default class ExpressGateway implements Gateway {
     request: Request,
     response: Response,
   ): Promise<void> {
-    console.log(`Handling ${request.method} request for ${request.path}`);
     const requestArgs = argumentExtractor(request);
-    console.log(`Extracted args: ${requestArgs}`);
     const controllerResponse = await actionHandler({ action: 'unused', args: requestArgs });
-    console.log('Preparing response');
     if (controllerResponse.isOk) this.setOkResponse(controllerResponse, response);
     else this.setErrorResponse(controllerResponse, response);
   }
