@@ -17,11 +17,11 @@ export default class MariaDBStorageVendor implements CombinedStorageVendor {
 
   constructor(
     connector: MariaDBConnector,
-    executorsFactory: QueryExecutorsFactory,
   ) {
-    this.eventQueryExecutor = executorsFactory.makeEventQueryExecutor(connector.connectionPool);
-    this.hallQueryExecutor = executorsFactory.makeHallQueryExecutor(connector.connectionPool);
-    this.ticketQueryExecutor = executorsFactory.makeTicketQueryExecutor(connector.connectionPool);
+    const executorsFactory = new QueryExecutorsFactory(connector.connectionPool);
+    this.eventQueryExecutor = executorsFactory.makeEventQueryExecutor();
+    this.hallQueryExecutor = executorsFactory.makeHallQueryExecutor();
+    this.ticketQueryExecutor = executorsFactory.makeTicketQueryExecutor();
   }
 
   async saveEvent(data: StoredEventData): Promise<void> {

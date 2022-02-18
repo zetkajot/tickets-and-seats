@@ -9,7 +9,6 @@ import MariaDBStorageVendor from './mariadb-storage-vendor';
 import ConfigSingleton from '../../../utils/config-singleton';
 import utilityQueries from './utils/utility-queries';
 import MariaDBConnector from './mariadb-connector';
-import QueryExecutorsFactory from './query-executors/query-executors-factory';
 import setupInTestEnv from './utils/setup-in-test-env';
 import cleanupInTestEnv from './utils/cleanup-in-test-env';
 
@@ -17,13 +16,12 @@ use(chaiAsPromised);
 
 const { mariadbConfig } = ConfigSingleton.getConfig();
 const connector = new MariaDBConnector(mariadbConfig);
-const executorsFactory = new QueryExecutorsFactory();
 let vendor: MariaDBStorageVendor;
 
 describe('MariaDB SV Component test suite', () => {
   before(async () => {
     await connector.start(setupInTestEnv);
-    vendor = new MariaDBStorageVendor(connector, executorsFactory);
+    vendor = new MariaDBStorageVendor(connector);
   });
   after(async () => {
     await connector.stop(cleanupInTestEnv);

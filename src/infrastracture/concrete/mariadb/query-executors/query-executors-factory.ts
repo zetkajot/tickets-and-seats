@@ -17,30 +17,32 @@ import { QueryCreators } from './types/query-creators';
 import { TicketQueryExecutor } from './types/ticket-query-executor';
 
 export default class QueryExecutorsFactory {
-  makeEventQueryExecutor(pool: Pool): EventQueryExecutor {
+  constructor(private pool: Pool) {}
+
+  makeEventQueryExecutor(): EventQueryExecutor {
     return new QueryExecutor(
       'event',
-      pool,
+      this.pool,
       queryCreators,
       sanitizeEventData,
       resultSetToEventData,
     );
   }
 
-  makeTicketQueryExecutor(pool: Pool): TicketQueryExecutor {
+  makeTicketQueryExecutor(): TicketQueryExecutor {
     return new QueryExecutor(
       'ticket',
-      pool,
+      this.pool,
       queryCreators,
       sanitizeTicketData,
       resultSetToTicketData,
     );
   }
 
-  makeHallQueryExecutor(pool: Pool): HallQueryExecutor {
+  makeHallQueryExecutor(): HallQueryExecutor {
     return new QueryExecutor(
       'hall',
-      pool,
+      this.pool,
       queryCreators,
       sanitizeHallData,
       resultSetToHallData,
