@@ -34,7 +34,7 @@ export default class AppManager {
     const port = +<string>process.env.PORT || expressConfig.port;
     console.log(`PORT ENV is ${process.env.PORT}`);
     console.log(`App binding to ${port}`);
-    await this.gateway.open(port);
+    await this.gateway.open(port, '0.0.0.0');
   }
 
   async stop() {
