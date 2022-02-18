@@ -2,34 +2,40 @@ import { expect } from 'chai';
 import JSONSchemaParser from './json-schema-parser';
 import ParserError from './errors/parser-error';
 import { JSONParserSchema } from './types/json-parser-schema';
-import { exactValue, inValues } from './parser-utility-functions';
+import { array, exactValue, inValues } from './parser-utility-functions';
 import ParserType from './parser-type';
 
 const exampleSchema: JSONParserSchema = {
   key1: ParserType.STRING,
   key2: inValues(['allowed-value1', 'allowed-value2']),
-  key3: {
+  key3: array({
     'sub-key1': exactValue(true),
     'sub-key2': ParserType.NUMBER,
-  },
+  }),
 };
 
 const exampleInvalidJSON = '{some-val: 1,}';
 const exampleInvalidStructure = JSON.stringify({
   key1: 'some string',
   key2: 'not-allowe-value',
-  key3: {
+  key3: [{
     'sub-key1': true,
     'sub-key2': 2109,
-  },
+  }],
 });
 const exampleValidStructure = JSON.stringify({
   key1: 'some other string',
   key2: 'allowed-value2',
-  key3: {
-    'sub-key1': true,
-    'sub-key2': 123,
-  },
+  key3: [
+    {
+      'sub-key1': true,
+      'sub-key2': 123,
+    },
+    {
+      'sub-key1': true,
+      'sub-key2': 123,
+    },
+  ],
 });
 
 describe('JSON Schema Parser test suite', () => {
@@ -68,7 +74,20 @@ describe('JSON Schema Parser test suite', () => {
         parser.forKey('sub-key1', () => ['newKey', false]);
         const parsedObject = parser.parse(exampleValidStructure);
 
-        expect(parsedObject).to.have.nested.property('key3.newKey', false);
+        expect(parsedObject).to.deep.equal({
+          key1: 'some other string',
+          key2: 'allowed-value2',
+          key3: [
+            {
+              newKey: false,
+              'sub-key2': 123,
+            },
+            {
+              newKey: false,
+              'sub-key2': 123,
+            },
+          ],
+        });
       });
     });
     describe('When value has custom behaviour set', () => {
@@ -78,7 +97,20 @@ describe('JSON Schema Parser test suite', () => {
         parser.forValue((value: any) => typeof value === 'number', (name, value) => ['i am a number', value]);
         const parsedObject = parser.parse(exampleValidStructure);
 
-        expect(parsedObject).to.have.nested.property('key3.i am a number', 123);
+        expect(parsedObject).to.deep.equal({
+          key1: 'some other string',
+          key2: 'allowed-value2',
+          key3: [
+            {
+              'sub-key1': true,
+              'i am a number': 123,
+            },
+            {
+              'sub-key1': true,
+              'i am a number': 123,
+            },
+          ],
+        });
       });
     });
     describe('When both key and value have custom behaviours set', () => {

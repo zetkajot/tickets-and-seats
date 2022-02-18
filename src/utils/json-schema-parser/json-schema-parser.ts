@@ -16,7 +16,7 @@ export default class JSONSchemaParser<T> {
 
   private keyValuePairMatchers: Map<KeyValuePairMatcher, PropertyChanger> = new Map();
 
-  constructor(schema: JSONParserSchema) {
+  constructor(private schema: JSONParserSchema) {
     this.structureValidator = new SchemaStructureValidator(schema);
   }
 
@@ -42,6 +42,8 @@ export default class JSONSchemaParser<T> {
     Object.entries(target).forEach(([key, value]) => {
       if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
         this.change(target[key]);
+      } else if (Array.isArray(value) && typeof value[0] === 'object') {
+        value.forEach((nestedObj) => this.change(nestedObj));
       } else {
         // eslint-disable-next-line no-restricted-syntax
         for (const [matcher, changeBehaviour] of this.valueMatchers.entries()) {
