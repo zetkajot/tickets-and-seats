@@ -1,0 +1,88 @@
+{
+  "routes": [
+    {
+      "actionSignature": "findOneEvent", 
+      "method": "GET",
+      "path": "/event",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "findEvents", 
+      "method": "GET",
+      "path": "/event/find",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "createEvent", 
+      "method": "POST",
+      "path": "/event",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "deleteEvent", 
+      "method": "DELETE",
+      "path": "/event",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "openEvent", 
+      "method": "PUT",
+      "path": "/event/open",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "closeEvent", 
+      "method": "PUT",
+      "path": "/event/close",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "getEventSeats", 
+      "method": "GET",
+      "path": "/event/seats",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "findOneHall", 
+      "method": "GET",
+      "path": "/hall",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "findHalls", 
+      "method": "GET",
+      "path": "/hall/find",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "createHall", 
+      "method": "POST",
+      "path": "/hall",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "deleteHall", 
+      "method": "DELETE",
+      "path": "/hall",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "issueTicket", 
+      "method": "POST",
+      "path": "/ticket",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "cancelTicket", 
+      "method": "DELETE",
+      "path": "/ticket",
+      "argumentExtractor": "extractArgsFromQuery"
+    },
+    {
+      "actionSignature": "checkTicket", 
+      "method": "GET",
+      "path": "/ticket",
+      "argumentExtractor": "extractArgsFromQuery"
+    }
+  ]
+}

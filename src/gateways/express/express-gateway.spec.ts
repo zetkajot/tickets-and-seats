@@ -50,59 +50,72 @@ const OverridableExpressGateway = class extends ExpressGateway {
 };
 
 const exampleSchema1: ExpressRouteSchema = {
-  action1: {
-    method: 'DELETE',
-    path: 'some/path',
-    argumentExtractor: () => ({} as ControllerRequestArguments),
-  },
-  action2: {
-    method: 'POST',
-    path: 'some/other/path',
-    argumentExtractor: () => ({} as ControllerRequestArguments),
-  },
+  routes: [
+    {
+      actionSignature: 'action1',
+      method: 'DELETE',
+      path: 'some/path',
+      argumentExtractor: () => ({} as ControllerRequestArguments),
+    }, {
+      actionSignature: 'action2',
+      method: 'POST',
+      path: 'some/other/path',
+      argumentExtractor: () => ({} as ControllerRequestArguments),
+    },
+  ],
 };
 
 const exampleSchema2: ExpressRouteSchema = {
-  postAction1: {
-    method: 'POST',
-    path: 'post/action/1',
-    argumentExtractor: undefined as any,
-  },
-  postAction2: {
-    method: 'POST',
-    path: 'post/action/2',
-    argumentExtractor: undefined as any,
-  },
-  getAction1: {
-    method: 'GET',
-    path: 'get/action/1',
-    argumentExtractor: undefined as any,
-  },
-  getAction2: {
-    method: 'GET',
-    path: 'get/action/2',
-    argumentExtractor: undefined as any,
-  },
-  putAction1: {
-    method: 'PUT',
-    path: 'put/action/1',
-    argumentExtractor: undefined as any,
-  },
-  putAction2: {
-    method: 'PUT',
-    path: 'put/action/2',
-    argumentExtractor: undefined as any,
-  },
-  deleteAction1: {
-    method: 'DELETE',
-    path: 'delete/action/1',
-    argumentExtractor: undefined as any,
-  },
-  deleteAction2: {
-    method: 'DELETE',
-    path: 'delete/action/2',
-    argumentExtractor: undefined as any,
-  },
+  routes: [
+    {
+      actionSignature: 'postAction1',
+      method: 'POST',
+      path: 'post/action/1',
+      argumentExtractor: undefined as any,
+    },
+    {
+      actionSignature: 'postAction2',
+      method: 'POST',
+      path: 'post/action/2',
+      argumentExtractor: undefined as any,
+    },
+    {
+      actionSignature: 'getAction1',
+      method: 'GET',
+      path: 'get/action/1',
+      argumentExtractor: undefined as any,
+    },
+    {
+      actionSignature: 'getAction2',
+      method: 'GET',
+      path: 'get/action/2',
+      argumentExtractor: undefined as any,
+    },
+    {
+      actionSignature: 'putAction1',
+      method: 'PUT',
+      path: 'put/action/1',
+      argumentExtractor: undefined as any,
+    },
+    {
+      actionSignature: 'putAction2',
+      method: 'PUT',
+      path: 'put/action/2',
+      argumentExtractor: undefined as any,
+    },
+    {
+      actionSignature: 'deleteAction1',
+      method: 'DELETE',
+      path: 'delete/action/1',
+      argumentExtractor: undefined as any,
+    },
+    {
+      actionSignature: 'deleteAction2',
+      method: 'DELETE',
+      path: 'delete/action/2',
+      argumentExtractor: undefined as any,
+    },
+  ],
 };
 
 describe('Express Gateway test suite', () => {

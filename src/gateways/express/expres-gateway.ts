@@ -23,8 +23,10 @@ export default class ExpressGateway implements Gateway {
       PUT: this.addPutRoute.bind(this),
     };
 
-    Object.entries(schema).forEach(([signature, { path, method, argumentExtractor }]) => {
-      const actionHandler = controller.getActionHandler(signature);
+    schema.routes.forEach(({
+      actionSignature, method, path, argumentExtractor,
+    }) => {
+      const actionHandler = controller.getActionHandler(actionSignature);
       addRouteForMethod[method](path, argumentExtractor, actionHandler);
     });
   }
@@ -81,7 +83,9 @@ export default class ExpressGateway implements Gateway {
     response: Response,
   ): Promise<void> {
     const requestArgs = argumentExtractor(request);
+
     const controllerResponse = await actionHandler({ action: 'unused', args: requestArgs });
+
     if (controllerResponse.isOk) this.setOkResponse(controllerResponse, response);
     else this.setErrorResponse(controllerResponse, response);
   }
