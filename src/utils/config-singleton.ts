@@ -19,11 +19,15 @@ export default class ConfigSingleton {
         password: process.env.MARIADB_PASS as string,
         database: process.env.MARIADB_DB as string,
       },
+      {
+        port: +(process.env.EXPRESS_PORT as string),
+      },
     );
   }
 
   private constructor(
     public readonly mariadbConfig: MariaDBConfig,
+    public readonly expressConfig: ExpressConfig,
   ) {}
 }
 
@@ -33,4 +37,8 @@ type MariaDBConfig = {
   user: string,
   password: string,
   database: string,
+};
+
+type ExpressConfig = {
+  port: number;
 };
