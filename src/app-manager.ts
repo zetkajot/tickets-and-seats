@@ -31,7 +31,8 @@ export default class AppManager {
     const routeSchema = parseRouteSchema(path.join(__dirname, `..${path.sep}`, 'schemas', 'route_schema.json'));
     const controller = new Controller(storageVendor, controllerSchema);
     this.gateway = new ExpressGateway(routeSchema, controller);
-    await this.gateway.open(expressConfig.port);
+    const port = +<string>process.env.PORT || expressConfig.port || 0;
+    await this.gateway.open(port, '0.0.0.0');
   }
 
   async stop() {
