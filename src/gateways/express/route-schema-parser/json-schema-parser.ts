@@ -1,4 +1,3 @@
-import { inspect } from 'util';
 import ParserError from './errors/parser-error';
 import SchemaStructureValidator from './schema-structure-validator';
 import { JSONParserSchema } from './types/json-parser-schema';
