@@ -15,18 +15,18 @@ async function initializeTables(pool: Pool) {
 }
 
 async function clearTableData(pool: Pool) {
-  await pool.query('DELETE FROM ticket');
-  await pool.query('DELETE FROM event');
-  await pool.query('DELETE FROM hall');
+  await pool.query('DELETE FROM Ticket');
+  await pool.query('DELETE FROM Event');
+  await pool.query('DELETE FROM Hall');
 }
 
 async function dropTables(pool: Pool) {
-  await pool.query('DROP TABLE IF EXISTS ticket, event, hall;');
+  await pool.query('DROP TABLE IF EXISTS Ticket, Event, Hall;');
 }
 
 async function insertDummyData(pool: Pool): Promise<void> {
   await pool.batch(
-    'INSERT INTO hall (id, name, layout) VALUES (?, ?, ?);',
+    'INSERT INTO Hall (id, name, layout) VALUES (?, ?, ?);',
     [
       ['hall-id-1', 'hall no 1', '[]'],
       ['hall-id-2', 'hall no 2', '[[1, 0, 0]]'],
@@ -35,7 +35,7 @@ async function insertDummyData(pool: Pool): Promise<void> {
     ],
   );
   await pool.batch(
-    'INSERT INTO event (id, name, hallid, startsat, endsat, isopen, reservedseats) VALUES (?, ?, ?, ?, ?, ?, ?);',
+    'INSERT INTO Event (id, name, hallid, startsat, endsat, isopen, reservedseats) VALUES (?, ?, ?, ?, ?, ?, ?);',
     [
       ['event-id-1', 'event no 1', 'hall-id-1', new Date('2020').getTime(), new Date('2021').getTime(), false, '[]'],
       ['event-id-2', 'event no 2', 'hall-id-3', new Date('2013').getTime(), new Date('2019').getTime(), true, '[2, 1]'],
@@ -45,7 +45,7 @@ async function insertDummyData(pool: Pool): Promise<void> {
     ],
   );
   await pool.batch(
-    'INSERT INTO ticket (id, eventid, seatno) VALUES (?, ?, ?);',
+    'INSERT INTO Ticket (id, eventid, seatno) VALUES (?, ?, ?);',
     [
       ['ticket-id-1', 'event-id-2', 1],
       ['ticket-id-2', 'event-id-2', 2],

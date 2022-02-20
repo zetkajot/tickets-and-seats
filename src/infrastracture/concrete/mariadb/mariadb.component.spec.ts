@@ -2,6 +2,7 @@
 import { expect, use } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Pool } from 'mariadb';
+import sinonChai from 'sinon-chai';
 import { StoredEventData } from '../../storage-vendors/event-storage-vendor';
 import { StoredHallData } from '../../storage-vendors/hall-storage-vendor';
 import { StoredTicketData } from '../../storage-vendors/ticket-storage-vendor';
@@ -11,7 +12,6 @@ import utilityQueries from './utils/utility-queries';
 import MariaDBConnector from './mariadb-connector';
 import setupInTestEnv from './utils/setup-in-test-env';
 import cleanupInTestEnv from './utils/cleanup-in-test-env';
-import sinonChai from 'sinon-chai';
 
 use(chaiAsPromised);
 use(sinonChai);
