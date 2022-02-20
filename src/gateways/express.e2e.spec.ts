@@ -23,7 +23,7 @@ describe('Express Gateway E2E tests', () => {
     storageVendor = new MariaDBStorageVendor(connector);
 
     const controllerSchema = parseSchema(path.join(process.cwd(), 'schemas', 'controller_schema.json'));
-    const routeSchema = parseRouteSchema(path.join(process.cwd(), 'schemas',  'route_schema.json'));
+    const routeSchema = parseRouteSchema(path.join(process.cwd(), 'schemas', 'route_schema.json'));
     const controller = new Controller(storageVendor, controllerSchema);
 
     const gateway = new ExpressGateway(routeSchema, controller);
