@@ -1,13 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import Sinon from 'sinon';
-import { expect } from 'chai';
+import { expect, use } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import sinonChai from 'sinon-chai';
 import { ControllerSchema } from './types/controller-schema';
 import { UseCaseConstructor } from './types/use-case-constructor';
 import Controller from './controller';
 import CombinedStorageVendor from '../infrastracture/storage-vendors/combined-storage-vendor';
 import { ControllerRequest } from './types/controller-request';
 import InvalidRequestError from './errors/invalid-request-error';
+
+use(chaiAsPromised);
+use(sinonChai);
 
 const SpiedClass = class {
   public static constructorSpy = Sinon.spy();
