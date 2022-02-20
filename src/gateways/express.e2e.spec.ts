@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { expect } from 'chai';
-import path from 'node:path/win32';
+import path from 'node:path';
 import ConfigSingleton from '../utils/config-singleton';
 import ExpressGateway from './express/expres-gateway';
 import parseSchema from '../controller/schema-parser/parse-schema';
