@@ -1,8 +1,25 @@
 version: 2.1
-orbs:
-  node: circleci/node@5.0.0
+executors:
+  my-custom-executor:
+    docker:
+      - image: cimg/node:lts
+        auth:
+          # ensure you have first added these secrets
+          # visit app.circleci.com/settings/project/github/zetkajot/tickets-and-seats/environment-variables
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
+jobs:
+  unit-tests:
+
+    executor: my-custom-executor
+    steps:
+      - checkout
+      - run: |
+          npm install
+          node --version
+          npm test
+
 workflows:
-    example-workflow:
-      jobs:
-        - node/test:
-            test-results-for: mocha 
+  my-custom-workflow:
+    jobs:
+      - unit-tests
