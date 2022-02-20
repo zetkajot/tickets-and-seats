@@ -24,8 +24,8 @@ executors:
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
         environment:
-          MARIADB_ROOT_PASSWORD: test,
-          MARIADB_DATABASE: test,
+          MARIADB_ROOT_PASSWORD: test
+          MARIADB_DATABASE: test
 jobs:
   unit-tests:
     executor: basic-node-executor
