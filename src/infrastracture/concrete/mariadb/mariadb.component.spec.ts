@@ -11,8 +11,10 @@ import utilityQueries from './utils/utility-queries';
 import MariaDBConnector from './mariadb-connector';
 import setupInTestEnv from './utils/setup-in-test-env';
 import cleanupInTestEnv from './utils/cleanup-in-test-env';
+import sinonChai from 'sinon-chai';
 
 use(chaiAsPromised);
+use(sinonChai);
 
 const { mariadbConfig } = ConfigSingleton.getConfig();
 const connector = new MariaDBConnector(mariadbConfig);
