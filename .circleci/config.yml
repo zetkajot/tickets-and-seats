@@ -43,7 +43,7 @@ jobs:
           npm install
           node --version
           printf "MARIADB_HOST=\"127.0.0.1\"\nMARIADB_PORT=\"3306\"\nMARIADB_USER=\"root\"\nMARIADB_PASS=\"test\"\nMARIADB_DB=\"test\"" > .env
-          npm run component-test
+          npm run component-test && npm run e2e-test
 workflows:
   my-custom-workflow:
     jobs:
