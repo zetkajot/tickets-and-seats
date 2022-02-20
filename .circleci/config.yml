@@ -1,25 +1,51 @@
 version: 2.1
 executors:
-  my-custom-executor:
+  node-with-db-executor:
     docker:
       - image: cimg/node:lts
         auth:
-          # ensure you have first added these secrets
-          # visit app.circleci.com/settings/project/github/zetkajot/tickets-and-seats/environment-variables
           username: $DOCKER_HUB_USER
           password: $DOCKER_HUB_PASSWORD
+      - image: mariadb
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
+        environment:
+          MARIADB_ROOT_PASSWORD: test,
+          MARIADB_DATABASE: test,
+  basic-node-executor:
+    docker:
+      - image: cimg/node:lts
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
+      - image: mariadb
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
+        environment:
+          MARIADB_ROOT_PASSWORD: test,
+          MARIADB_DATABASE: test,
 jobs:
   unit-tests:
-
-    executor: my-custom-executor
+    executor: basic-node-executor
     steps:
       - checkout
       - run: |
           npm install
           node --version
           npm test
-
+  component-and-e2e-tests:
+    executor: node-with-db-executor
+    steps:
+      - checkout 
+      - run: |
+          npm install
+          node --version
+          echo "MARIADB_HOST=\"127.0.0.1\"\nMARIADB_PORT=\"3306\"\nMARIADB_USER=\"root\"\nMARIADB_PASS=\"test\"\nMARIADB_DB=\"test\" > .env
+          npm run component-test
 workflows:
   my-custom-workflow:
     jobs:
       - unit-tests
+      - component-and-e2e-tests
