@@ -16,6 +16,8 @@ export default class ExpressGateway implements Gateway {
   constructor(schema: ExpressRouteSchema, controller: Controller) {
     this.expressApp = express();
 
+    this.expressApp.use(express.json());
+
     const addRouteForMethod = {
       GET: this.addGetRoute.bind(this),
       POST: this.addPostRoute.bind(this),
