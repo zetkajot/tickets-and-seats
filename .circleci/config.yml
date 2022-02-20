@@ -2,7 +2,7 @@ version: 2.1
 executors:
   my-custom-executor:
     docker:
-      - image: cimg/node
+      - image: cimg/node:lts
         auth:
           # ensure you have first added these secrets
           # visit app.circleci.com/settings/project/github/zetkajot/tickets-and-seats/environment-variables
