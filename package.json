@@ -6,7 +6,7 @@
   "license": "ISC",
   "description": "Automaticaly generated description",
   "scripts": {
-    "test": "mocha -r ts-node/register --exclude src/**/*.component.spec.ts --exclude src/**/*.integration.spec.ts --exclude src/**/*.e2e.spec.ts src/**/*.spec.ts",
+    "test": "mocha -r ts-node/register --exclude \"src/**/*.component.spec.ts\" --exclude \"src/**/*.integration.spec.ts\" --exclude \"src/**/*.e2e.spec.ts\" \"src/**/*.spec.ts\"",
     "component-test": "mocha -r ts-node/register src/**/*.component.spec.ts",
     "integration-test": "mocha -r ts-node/register src/**/*.integration.spec.ts",
     "e2e-test": "mocha -r ts-node/register --timeout 10000 src/**/*.e2e.spec.ts",
