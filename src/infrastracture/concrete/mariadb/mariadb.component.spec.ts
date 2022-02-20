@@ -33,14 +33,14 @@ describe('MariaDB SV Component test suite', () => {
     before(async () => {
       tables = await getTables(connector.connectionPool);
     });
-    it('Has \'event\' table', () => {
-      expect(tables).to.include('event');
+    it('Has \'Event\' table', () => {
+      expect(tables).to.include('Event');
     });
-    it('Has \'ticket\' table', () => {
-      expect(tables).to.include('ticket');
+    it('Has \'Ticket\' table', () => {
+      expect(tables).to.include('Ticket');
     });
-    it('Has \'hall\' table', () => {
-      expect(tables).to.include('hall');
+    it('Has \'Hall\' table', () => {
+      expect(tables).to.include('Hall');
     });
   });
   describe('methods tests', () => {
@@ -97,7 +97,7 @@ describe('MariaDB SV Component test suite', () => {
           layout: [[3, 13, 12], [293, 23, 184]],
         };
         await vendor.saveHall(hallData);
-        const savedData = await connector.connectionPool.query('SELECT * FROM hall WHERE id = \'hall-id-4\';');
+        const savedData = await connector.connectionPool.query('SELECT * FROM Hall WHERE id = \'hall-id-4\';');
         expect(savedData[0]).to.deep.equal({
           id: 'hall-id-4',
           name: 'my precious hall',
@@ -118,7 +118,7 @@ describe('MariaDB SV Component test suite', () => {
         };
         await vendor.saveEvent(eventData);
 
-        const savedData = await connector.connectionPool.query('SELECT * FROM event WHERE id = \'event-id-4\';');
+        const savedData = await connector.connectionPool.query('SELECT * FROM Event WHERE id = \'event-id-4\';');
 
         expect(savedData[0]).to.deep.equal({
           id: eventData.id,
@@ -141,7 +141,7 @@ describe('MariaDB SV Component test suite', () => {
 
         await vendor.saveTicket(ticketData);
 
-        const savedData = await connector.connectionPool.query('SELECT * FROM ticket WHERE id = \'ticket-id-19\';');
+        const savedData = await connector.connectionPool.query('SELECT * FROM Ticket WHERE id = \'ticket-id-19\';');
 
         expect(savedData[0]).to.deep.equal({
           id: 'ticket-id-19',
@@ -154,7 +154,7 @@ describe('MariaDB SV Component test suite', () => {
       it('Removes matching data from db', async () => {
         await vendor.deleteHall('hall-id-2');
 
-        const deletedData = await connector.connectionPool.query('SELECT * FROM hall WHERE id = \'hall-id-2\'');
+        const deletedData = await connector.connectionPool.query('SELECT * FROM Hall WHERE id = \'hall-id-2\'');
 
         expect(deletedData).to.be.an('array').that.is.empty;
       });
@@ -163,7 +163,7 @@ describe('MariaDB SV Component test suite', () => {
       it('Removes matching data from db', async () => {
         await vendor.deleteEvent('event-id-1');
 
-        const deletedData = await connector.connectionPool.query('SELECT * FROM hall WHERE id = \'event-id-1\'');
+        const deletedData = await connector.connectionPool.query('SELECT * FROM Hall WHERE id = \'event-id-1\'');
 
         expect(deletedData).to.be.an('array').that.is.empty;
       });
@@ -172,7 +172,7 @@ describe('MariaDB SV Component test suite', () => {
       it('Removes matching data from db', async () => {
         await vendor.deleteTicket('ticket-id-1');
 
-        const deletedData = await connector.connectionPool.query('SELECT * FROM hall WHERE id = \'ticket-id-1\'');
+        const deletedData = await connector.connectionPool.query('SELECT * FROM Hall WHERE id = \'ticket-id-1\'');
 
         expect(deletedData).to.be.an('array').that.is.empty;
       });
