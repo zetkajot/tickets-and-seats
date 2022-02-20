@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { expect } from 'chai';
-import path from 'node:path/win32';
+import path from 'node:path';
 import ConfigSingleton from '../utils/config-singleton';
 import ExpressGateway from './express/expres-gateway';
 import parseSchema from '../controller/schema-parser/parse-schema';
@@ -22,8 +22,8 @@ describe('Express Gateway E2E tests', () => {
 
     storageVendor = new MariaDBStorageVendor(connector);
 
-    const controllerSchema = parseSchema(path.join(__dirname, '..\\..\\schemas\\controller_schema.json'));
-    const routeSchema = parseRouteSchema(path.join(__dirname, '..\\..\\schemas\\route_schema.json'));
+    const controllerSchema = parseSchema(path.join(process.cwd(), 'schemas', 'controller_schema.json'));
+    const routeSchema = parseRouteSchema(path.join(process.cwd(), 'schemas', 'route_schema.json'));
     const controller = new Controller(storageVendor, controllerSchema);
 
     const gateway = new ExpressGateway(routeSchema, controller);

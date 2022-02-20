@@ -13,7 +13,8 @@ export default function parseSchema(location: PathOrFileDescriptor): ControllerS
     fileContent = readFileSync(location, {
       encoding: 'utf8',
     });
-  } catch {
+  } catch (error) {
+    console.log(error);
     throw new ControllerSchemaError(ControllerSchemaErrorSubtype.MISSING_SCHEMA);
   }
   const parsedFileContent = tryParsingJSON(fileContent);

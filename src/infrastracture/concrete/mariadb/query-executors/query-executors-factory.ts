@@ -21,7 +21,7 @@ export default class QueryExecutorsFactory {
 
   makeEventQueryExecutor(): EventQueryExecutor {
     return new QueryExecutor(
-      'event',
+      'Event',
       this.pool,
       queryCreators,
       sanitizeEventData,
@@ -31,7 +31,7 @@ export default class QueryExecutorsFactory {
 
   makeTicketQueryExecutor(): TicketQueryExecutor {
     return new QueryExecutor(
-      'ticket',
+      'Ticket',
       this.pool,
       queryCreators,
       sanitizeTicketData,
@@ -41,7 +41,7 @@ export default class QueryExecutorsFactory {
 
   makeHallQueryExecutor(): HallQueryExecutor {
     return new QueryExecutor(
-      'hall',
+      'Hall',
       this.pool,
       queryCreators,
       sanitizeHallData,
