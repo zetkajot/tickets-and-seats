@@ -362,12 +362,12 @@ paths:
                   description: ID of the event you are issuing ticket for
                   type: string
                   format: uuid
-                seatNo:
+                seatNumber:
                   description: Number of the seat that this ticket is for
                   type: number
               required:
                 - 'eventId'
-                - 'seatNo'
+                - 'seatNumber'
       responses:
         '200':
           $ref: '#/components/responses/OkResponse'
