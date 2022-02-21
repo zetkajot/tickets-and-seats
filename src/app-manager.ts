@@ -1,6 +1,7 @@
 import path from 'path';
 import Controller from './controller/controller';
 import parseSchema from './controller/schema-parser/parse-schema';
+import ErrorFactory from './error/error-factory';
 import ExpressGateway from './gateways/express/expres-gateway';
 import parseRouteSchema from './gateways/express/parse-route-schema';
 import MariaDBConnector from './infrastracture/concrete/mariadb/mariadb-connector';
@@ -16,6 +17,7 @@ export default class AppManager {
   private gateway: ExpressGateway | undefined;
 
   constructor() {
+    ErrorFactory.setDefaultLogger();
     this.connector = new MariaDBConnector(mariadbConfig);
     this.bindSIGINT();
   }
