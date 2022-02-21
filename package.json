@@ -3,7 +3,7 @@
   "main": "dist/main.js",
   "keywords": "",
   "author": "zkkj@kaczka.xyz",
-  "license": "ISC",
+  "license": "Apache 2.0",
   "description": "Automaticaly generated description",
   "scripts": {
     "test": "mocha -r ts-node/register --exclude \"src/**/*.component.spec.ts\" --exclude \"src/**/*.integration.spec.ts\" --exclude \"src/**/*.e2e.spec.ts\" \"src/**/*.spec.ts\"",
