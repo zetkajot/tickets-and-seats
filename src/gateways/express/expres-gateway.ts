@@ -1,6 +1,8 @@
 import express, { Application, Request, Response } from 'express';
 import { Server } from 'http';
+import https from 'https';
 import { join } from 'path';
+import { KeyObject } from 'tls';
 import Controller from '../../controller/controller';
 import { ActionHandler } from '../../controller/types/action-handler';
 import { ControllerResponse } from '../../controller/types/controller-response';
@@ -13,6 +15,8 @@ export default class ExpressGateway implements Gateway {
   public readonly expressApp: Application;
 
   private expressServer: Server | undefined;
+
+  private expressSSLServer: Server | undefined;
 
   constructor(schema: ExpressRouteSchema, controller: Controller) {
     this.expressApp = express();
@@ -132,6 +136,20 @@ export default class ExpressGateway implements Gateway {
       this.expressServer = this.expressApp.listen(port, hostname, () => {
         resolve();
       });
+    });
+  }
+
+  openSecure(
+    cert: string | Buffer | (string | Buffer)[],
+    key: string | Buffer | (Buffer | KeyObject)[],
+    port: number,
+    hostname = 'localhost',
+  ): Promise<void> {
+    return new Promise((resolve) => {
+      this.expressSSLServer = https.createServer({
+        cert, key,
+      }, this.expressApp).listen(port, hostname);
+      this.expressSSLServer.on('listening', () => resolve());
     });
   }
 
