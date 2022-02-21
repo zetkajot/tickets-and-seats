@@ -50,7 +50,7 @@ jobs:
   build:
     executor: node-with-db-executor
     steps:
-      - checkout
+      - install
       - run: |
           npm run build
 workflows:
