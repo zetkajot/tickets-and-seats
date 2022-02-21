@@ -39,6 +39,7 @@ jobs:
   make-env:
     executor: node-with-db-executor
     steps:
+      - checkout
       - run: |
           printf "MARIADB_HOST=\"127.0.0.1\"\nMARIADB_PORT=\"3306\"\nMARIADB_USER=\"root\"\nMARIADB_PASS=\"test\"\nMARIADB_DB=\"test\"" > .env 
   unit-tests:
@@ -46,22 +47,23 @@ jobs:
     steps:
       - checkout
       - run: |
-          npm install
-          node --version
           npm test
   component-tests:
     executor: node-with-db-executor
     steps: 
+      - checkout
       - run: |          
           npm run component-test
   e2e-tests:
     executor: node-with-db-executor
     steps:
+      - checkout
       - run: |
           npm run e2e-test
   build:
     executor: node-with-db-executor
     steps:
+      - checkout
       - run: |
           npm run build
 workflows:
