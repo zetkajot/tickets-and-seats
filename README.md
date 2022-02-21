@@ -16,7 +16,7 @@ Simple app to manage creating events and booking seats and my shot at creating s
 ### Installation steps:
 #### 1. Clone this repository
 ```
-git clone https://github.com/zetkajot/tickets_and_seats
+git clone https://github.com/zetkajot/tickets-and-seats.git
 ```
 #### 2. Install dependencies
 ```
