@@ -1,4 +1,15 @@
 version: 2.1
+commands:
+  make-env:
+    steps:
+      - run: |
+          printf "MARIADB_HOST=\"127.0.0.1\"\nMARIADB_PORT=\"3306\"\nMARIADB_USER=\"root\"\nMARIADB_PASS=\"test\"\nMARIADB_DB=\"test\"" > .env  
+  install:
+    steps:
+      - checkout
+      - run: |
+          npm install
+          node --version
 orbs:
   heroku: circleci/heroku@1.2.6
 executors:
@@ -15,49 +26,25 @@ executors:
         environment:
           MARIADB_ROOT_PASSWORD: test
           MARIADB_DATABASE: test
-  basic-node-executor:
-    docker:
-      - image: cimg/node:lts
-        auth:
-          username: $DOCKER_HUB_USER
-          password: $DOCKER_HUB_PASSWORD
-      - image: mariadb
-        auth:
-          username: $DOCKER_HUB_USER
-          password: $DOCKER_HUB_PASSWORD
-        environment:
-          MARIADB_ROOT_PASSWORD: test
-          MARIADB_DATABASE: test
 jobs:
-  install:
-    executor: node-with-db-executor
-    steps: 
-      - checkout
-      - run: |
-          npm install
-          node --version
-  make-env:
-    executor: node-with-db-executor
-    steps:
-      - checkout
-      - run: |
-          printf "MARIADB_HOST=\"127.0.0.1\"\nMARIADB_PORT=\"3306\"\nMARIADB_USER=\"root\"\nMARIADB_PASS=\"test\"\nMARIADB_DB=\"test\"" > .env 
   unit-tests:
-    executor: basic-node-executor
+    executor: node-with-db-executor
     steps:
-      - checkout
+      - install
       - run: |
           npm test
   component-tests:
     executor: node-with-db-executor
     steps: 
-      - checkout
+      - install
+      - make-env
       - run: |          
           npm run component-test
   e2e-tests:
     executor: node-with-db-executor
     steps:
-      - checkout
+      - install
+      - make-env
       - run: |
           npm run e2e-test
   build:
@@ -69,20 +56,12 @@ jobs:
 workflows:
   check-and-deploy:
     jobs:
-      - install:
+      - unit-tests:
           filters:
             branches:
               only: 'main'
-      - make-env:
-          requires:
-            - 'install'
-      - unit-tests:
-          requires:
-            - 'install'
       - component-tests:
           requires:
-            - 'install'
-            - 'make-env'
             - 'unit-tests'
       - e2e-tests:
           requires:
