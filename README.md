@@ -8,7 +8,7 @@ Simple app to manage creating events and booking seats and my shot at creating s
 ## Installation
 *Those instructions apply to default version which uses MariaDB as a storage and Express as a gateway*
 
-*For quick look you can use live version [here](https://link).*  
+*For quick look you can use live version(with HTML API specification) [here](http://tickets.kaczka.xyz/).*  
 
 ### Requirements
 - Node >= 16
@@ -74,10 +74,10 @@ For the purpose of this example let's assume that this app is used as an seat re
 
 1. User taps on 'View available seats' on 'The Example Movie' page. 
 2. Gateway (GUI) prepares controller request knowing that tap on button with ID *'get-seats'* corresponds to *'get-event-seats'* action and that it (button) was displayed on page for movie with ID *'movie-id-1389'*
-3. Controller recieves following request:
+3. Gateway sends to controller following message:
    ```javascript
    {
-     action: 'get-event-seats',
+     action: 'some-action',
      args: [
        {
          name: 'eventId',
@@ -102,7 +102,7 @@ For the purpose of this example let's assume that this app is used as an seat re
 9. Controler (which serves the function of presenter) which previously invoked that use case uses its output to construct response:
    ```javascript
    {
-     status: 'OK',
+     isOk: true,
      data: {
        eventId: movie_id-1389,
        hallId: 'hall-3F',

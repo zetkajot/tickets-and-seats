@@ -7,6 +7,6 @@ export default function resultSetToHallData(resultSet: HallResultSet): StoredHal
   return nonMetadataRows.map((row) => ({
     id: row.id,
     name: row.name,
-    layout: row.layout as any,
+    layout: Array.isArray(row.layout) ? row.layout : JSON.parse(row.layout) as any,
   }));
 }

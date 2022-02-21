@@ -11,6 +11,7 @@ export default function resultSetToEventData(resultSet: EventResultSet): StoredE
     startsAt: new Date(row.startsat),
     endsAt: new Date(row.endsat),
     isOpen: !!row.isopen,
-    reservedSeats: row.reservedseats as any,
+    reservedSeats: Array
+      .isArray(row.reservedseats) ? row.reservedseats : JSON.parse(row.reservedseats) as any,
   }));
 }
