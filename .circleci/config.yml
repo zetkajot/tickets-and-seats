@@ -1,4 +1,17 @@
 version: 2.1
+commands:
+  make-env:
+    steps:
+      - run: |
+          printf "MARIADB_HOST=\"127.0.0.1\"\nMARIADB_PORT=\"3306\"\nMARIADB_USER=\"root\"\nMARIADB_PASS=\"test\"\nMARIADB_DB=\"test\"" > .env  
+  install:
+    steps:
+      - checkout
+      - run: |
+          npm install
+          node --version
+orbs:
+  heroku: circleci/heroku@1.2.6
 executors:
   node-with-db-executor:
     docker:
@@ -13,39 +26,49 @@ executors:
         environment:
           MARIADB_ROOT_PASSWORD: test
           MARIADB_DATABASE: test
-  basic-node-executor:
-    docker:
-      - image: cimg/node:lts
-        auth:
-          username: $DOCKER_HUB_USER
-          password: $DOCKER_HUB_PASSWORD
-      - image: mariadb
-        auth:
-          username: $DOCKER_HUB_USER
-          password: $DOCKER_HUB_PASSWORD
-        environment:
-          MARIADB_ROOT_PASSWORD: test
-          MARIADB_DATABASE: test
 jobs:
   unit-tests:
-    executor: basic-node-executor
-    steps:
-      - checkout
-      - run: |
-          npm install
-          node --version
-          npm test
-  component-and-e2e-tests:
     executor: node-with-db-executor
     steps:
-      - checkout 
+      - install
       - run: |
-          npm install
-          node --version
-          printf "MARIADB_HOST=\"127.0.0.1\"\nMARIADB_PORT=\"3306\"\nMARIADB_USER=\"root\"\nMARIADB_PASS=\"test\"\nMARIADB_DB=\"test\"" > .env
-          npm run component-test && npm run e2e-test
+          npm test
+  component-tests:
+    executor: node-with-db-executor
+    steps: 
+      - install
+      - make-env
+      - run: |          
+          npm run component-test
+  e2e-tests:
+    executor: node-with-db-executor
+    steps:
+      - install
+      - make-env
+      - run: |
+          npm run e2e-test
+  build:
+    executor: node-with-db-executor
+    steps:
+      - install
+      - run: |
+          npm run build
 workflows:
-  my-custom-workflow:
+  check-and-deploy:
     jobs:
-      - unit-tests
-      - component-and-e2e-tests
+      - unit-tests:
+          filters:
+            branches:
+              only: 'main'
+      - component-tests:
+          requires:
+            - 'unit-tests'
+      - e2e-tests:
+          requires:
+            - 'component-tests'
+      - build:
+          requires:
+            - 'e2e-tests'
+      - heroku/deploy-via-git:
+          requires:
+            - 'build'        
