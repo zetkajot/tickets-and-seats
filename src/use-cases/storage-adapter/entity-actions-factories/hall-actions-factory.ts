@@ -1,4 +1,5 @@
 /* eslint-disable class-methods-use-this */
+import { inspect } from 'util';
 import Hall from '../../../domain/hall';
 import { StoredHallData } from '../../../infrastracture/storage-vendors/hall-storage-vendor';
 import deconstructHall from '../../use-case-utils/deconstructors/deconstruct-hall';
@@ -23,6 +24,8 @@ export default class HallActionsFactory extends AbstractEntityActionsFactory<Hal
         related: false,
         unique: false,
       })(storageVendor.findHall.bind(storageVendor), params);
+
+      console.log(`Corresponding data set: ${inspect(hallDataSet)}`);
 
       return <Hall[]> hallDataSet.map((hallData) => tryReconstructing(
         reconstructHall,
