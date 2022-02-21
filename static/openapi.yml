@@ -1,0 +1,459 @@
+openapi: '3.0.2'
+info:
+  title: Tickets and Seats
+  version: '1.0.0'
+  description: Simple API for managing events
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+  - url: http://tickets.kaczka.xyz/
+components:
+  responses:
+    OkResponse:
+      description: Indicates successful request processing
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Ok'
+    InternalError:
+      description: Indicates that while processing your request, server encountered some internal problems
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Failed'
+              - type: object
+                properties:
+                  errorName:
+                    type: string
+                    enum:
+                      - InternalError
+    InvalidRequestError:
+      description: Indicates that your request had invalid structure
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Failed'
+              - type: object
+                properties:
+                  errorName:
+                    type: string
+                    enum:
+                      - InvalidRequestError
+    InvalidDataError:
+      description: Indicates that the data you sent with your request is invalid
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Failed'
+              - type: object
+                properties:
+                  errorName:
+                    type: string
+                    enum:
+                      - InvalidDataError
+    EntityNotFound:
+      description: Indicates that entity referenced in your query does not exist
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Failed'
+              - type: object
+                properties:
+                  errorName:
+                    type: string
+                    enum:
+                      - InvalidDataError
+    EventTwiceOpened:
+      description: 'Indicates that you tried to open already opened event'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Failed'
+              - type: object
+                properties:
+                  errorName:
+                    type: string
+                    enum:
+                      - InvalidDataError
+    EventTwiceClosed:
+      description: 'Indicates that you tried to close already closed event'
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Failed'
+              - type: object
+                properties:
+                  errorName:
+                    type: string
+                    enum:
+                      - InvalidDataError
+  schemas:
+    Ok:
+      type: object
+      properties:
+        isOk:
+          description: Always true in OkResponse
+          type: boolean
+          enum:
+            - true
+        data:
+          description: Request execution result
+          type: object
+    Failed:
+      type: object
+      properties:
+        isOk:
+          description: Always false in FailedResponse
+          type: boolean
+          enum:
+            - false
+        errorName:
+          description: Name of the error that occured during request processing
+          type: string
+        errorMessage:
+          description: Description of the aforementioned error
+          type: string
+  parameters:
+    idParam:
+      name: id
+      in: path
+      description: ID of the entity
+      required: true 
+      schema:
+        type: string
+        format: uuid
+paths:
+  /events:
+    post:
+      tags:
+        - "Events"
+      summary: Creates new event using given data
+      operationId: createEvent
+      requestBody:
+        description: Data of the new event
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  description: Name of the newly created event
+                  type: string
+                hallId:
+                  description: ID of the hall that the event will be held in
+                  type: string
+                  format: uuid
+                startsAt:
+                  description: Event starting date
+                  type: string
+                  format: date-time
+                endsAt:
+                  description: Event ending date
+                  type: string
+                  format: date-time
+              required:
+                - 'name'
+                - 'hallId'
+                - 'startsAt'
+                - 'endsAt'
+      responses:
+        '200':
+          $ref: '#/components/responses/OkResponse'
+        '422':
+          $ref: '#/components/responses/InvalidDataError'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+  /events/{id}:
+    get:
+      tags:
+        - "Events"
+      summary: Retrieves data of event with given id
+      operationId: findEventById
+      parameters:
+      - $ref: '#/components/parameters/idParam'
+      responses:
+        '200': 
+          $ref: '#/components/responses/OkResponse'
+        '404':
+          $ref: '#/components/responses/EntityNotFound'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags:
+        - "Events"
+      summary: Deletes event identified by given id
+      operationId: deleteEvent
+      parameters:
+      - $ref: '#/components/parameters/idParam'
+      responses:
+        '200': 
+          $ref: '#/components/responses/OkResponse'
+        '404':
+          $ref: '#/components/responses/EntityNotFound'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /events/{id}/open:
+    put:
+      tags:
+        - "Events"
+      operationId: openEvent
+      summary: Opens given event for reservations
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200': 
+          $ref: '#/components/responses/OkResponse'
+        '409':
+          $ref: '#/components/responses/EventTwiceOpened'
+        '404':
+          $ref: '#/components/responses/EntityNotFound'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /events/{id}/close:
+    put:
+      tags:
+        - "Events"
+      operationId: closeEvent
+      summary: Closes given event for reservations
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200': 
+          $ref: '#/components/responses/OkResponse'
+        '409':
+          $ref: '#/components/responses/EventTwiceClosed'
+        '404':
+          $ref: '#/components/responses/EntityNotFound'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /events/{id}/seats:
+    put:
+      tags:
+        - "Events"
+      operationId: getEventSeatsInfo
+      summary: Returns information about the seat layout, list of free and taken seats for given event 
+      parameters:
+        - $ref: '#/components/parameters/idParam'
+      responses:
+        '200': 
+          $ref: '#/components/responses/OkResponse'
+        '409':
+          $ref: '#/components/responses/EventTwiceClosed'
+        '404':
+          $ref: '#/components/responses/EntityNotFound'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /halls/{id}:
+    get:
+      tags:
+        - "Halls"
+      summary: Retrieves data of Hall with given id
+      operationId: findHallById
+      parameters:
+      - $ref: '#/components/parameters/idParam'
+      responses:
+        '200': 
+          $ref: '#/components/responses/OkResponse'
+        '404':
+          $ref: '#/components/responses/EntityNotFound'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags:
+        - "Halls"
+      summary: Deletes hall identified by given id
+      operationId: deleteHall
+      parameters:
+      - $ref: '#/components/parameters/idParam'
+      responses:
+        '200': 
+          $ref: '#/components/responses/OkResponse'
+        '404':
+          $ref: '#/components/responses/EntityNotFound'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /halls:
+    post:
+      tags:
+        - "Halls"
+      summary: Creates new hall using given data
+      operationId: createHall
+      requestBody:
+        description: Data of the new hall
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  description: Name of the newly created hall
+                  type: string
+                seatLayout:
+                  description: Hall's seat layout
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      seatNo:
+                        description: Seat number
+                        type: number
+                      seatPosition:
+                        description: Coordinates of the seat
+                        type: object
+                        properties:
+                          x:
+                            type: number
+                          y:
+                            type: number
+                        required:
+                          - "x"
+                          - 'y'
+                    required:
+                      - "seatNo"
+                      - "seatPosition"       
+              required:
+                - 'name'
+                - 'seatLayout'
+      responses:
+        '200':
+          $ref: '#/components/responses/OkResponse'
+        '422':
+          $ref: '#/components/responses/InvalidDataError'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+  /tickets:
+    post:
+      tags:
+        - "Tickets"
+      summary: Issue a ticket for a given event and seat
+      operationId: issueTicket
+      requestBody:
+        description: Issue a ticket for a given event and seat
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventId:
+                  description: ID of the event you are issuing ticket for
+                  type: string
+                  format: uuid
+                seatNo:
+                  description: Number of the seat that this ticket is for
+                  type: number
+              required:
+                - 'eventId'
+                - 'seatNo'
+      responses:
+        '200':
+          $ref: '#/components/responses/OkResponse'
+        '409':
+          $ref: '#/components/responses/InvalidDataError'
+        '404':
+          $ref: '#/components/responses/EntityNotFound'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+  /tickets/{id}:
+    get:
+      tags:
+        - 'Tickets'
+      summary: Retrieves data of a ticket with given id
+      operationId: validateTicket
+      parameters:
+      - $ref: '#/components/parameters/idParam'
+      responses:
+        '200': 
+          $ref: '#/components/responses/OkResponse'
+        '404':
+          $ref: '#/components/responses/EntityNotFound'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+    delete:
+      tags:
+        - 'Tickets'
+      summary: Cancels a ticket with given id
+      operationId: cancelTicket
+      parameters:
+      - $ref: '#/components/parameters/idParam'
+      responses:
+        '200': 
+          $ref: '#/components/responses/OkResponse'
+        '404':
+          $ref: '#/components/responses/EntityNotFound'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /find/halls:
+    get:
+      tags:
+        - 'Halls'
+      summary: Find all halls matching given criteria
+      operationId: findHalls
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: Name of the hall
+          required: false
+      responses:
+        '200': 
+          $ref: '#/components/responses/OkResponse'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /find/events:
+    get:
+      tags:
+        - "Events"
+      summary: Find all events matching given criteria
+      operationId: findEvents
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: Name of the event
+          required: false
+        - in: query
+          name: hallId
+          schema:
+            type: string
+            format: uuid
+          description: ID of the hall the event is taking place in
+          required: false
+      responses:
+        '200': 
+          $ref: '#/components/responses/OkResponse'
+        '400':
+          $ref: '#/components/responses/InvalidRequestError'
+        '500':
+          $ref: '#/components/responses/InternalError'
