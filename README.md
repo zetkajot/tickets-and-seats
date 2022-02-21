@@ -14,7 +14,31 @@ Simple app to manage creating events and booking seats and my shot at creating s
 - Node >= 16
 - Access to MariaDB server (10.6 recommended)
 ### Installation steps:
---- TODO ---
+#### 1. Clone this repository
+```
+git clone https://github.com/zetkajot/tickets_and_seats
+```
+#### 2. Install dependencies
+```
+npm install
+```
+#### 3. Build the project
+```
+npm run build
+```
+#### 4. Create `.env` file in projects main directory(i. e. where `package.json` resides) with following content:
+```
+MARIADB_HOST="MariaDB server address"
+MARIADB_PORT="MariaDB server Port"
+MARIADB_USER="MariaDB username"
+MARIADB_PASS="MariaDB password"
+MARIADB_DB="Database in MariaDB Server to use"
+EXPRESS_PORT="Port for the app to listen on"
+```
+4. Start the app
+```
+npm start
+```
 # The Intestines
 ## Overview
 App consists of following parts:

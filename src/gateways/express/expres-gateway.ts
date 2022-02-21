@@ -1,5 +1,6 @@
 import express, { Application, Request, Response } from 'express';
 import { Server } from 'http';
+import { join } from 'path';
 import Controller from '../../controller/controller';
 import { ActionHandler } from '../../controller/types/action-handler';
 import { ControllerResponse } from '../../controller/types/controller-response';
@@ -17,6 +18,7 @@ export default class ExpressGateway implements Gateway {
     this.expressApp = express();
 
     this.expressApp.use(express.json());
+    this.expressApp.use('/', express.static(join(process.cwd(), 'static')));
 
     const addRouteForMethod = {
       GET: this.addGetRoute.bind(this),
@@ -30,6 +32,10 @@ export default class ExpressGateway implements Gateway {
     }) => {
       const actionHandler = controller.getActionHandler(actionSignature);
       addRouteForMethod[method](path, argumentExtractor, actionHandler);
+    });
+
+    this.expressApp.get('*', (req, res) => {
+      res.status(404).sendFile(join(process.cwd(), 'static', '404.html'));
     });
   }
 
