@@ -21,6 +21,7 @@ export default class ConfigSingleton {
       },
       {
         port: +(process.env.EXPRESS_PORT as string),
+        sslPort: +(process.env.EXPRESS_HTTPS_PORT as string),
       },
     );
   }
@@ -41,4 +42,5 @@ type MariaDBConfig = {
 
 type ExpressConfig = {
   port: number;
+  sslPort: number;
 };
