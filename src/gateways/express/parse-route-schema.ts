@@ -10,6 +10,8 @@ import { ExpressRouteSchema } from './types/express-route-schema';
 
 const argumentExtractorLibrary: Record<string, ArgumentExtractor> = {
   extractArgsFromQuery,
+  extractArgsFromNamedParams,
+  extractArgsFromBody,
 };
 
 const routeSchema: JSONParserSchema = {
@@ -28,7 +30,6 @@ function makeRouteSchemaParser() {
 }
 
 export default function parseRouteSchema(pathToRouteSchema: string): ExpressRouteSchema {
-  console.log(`Reading route schema from ${pathToRouteSchema}`);
   const rawRouteSchema = readFileSync(pathToRouteSchema, { encoding: 'utf-8' });
   return makeRouteSchemaParser().parse(rawRouteSchema);
 }
@@ -36,4 +37,15 @@ export default function parseRouteSchema(pathToRouteSchema: string): ExpressRout
 function extractArgsFromQuery(request: express.Request): ControllerRequestArguments {
   return Object.entries(request.query)
     .map(([name, value]) => ({ name: name as string, value: value as string }));
+}
+
+function extractArgsFromNamedParams(request: express.Request): ControllerRequestArguments {
+  return Object.entries(request.params)
+    .filter(([, value]) => value)
+    .map(([name, value]) => ({ name: name as string, value: value as string }));
+}
+
+function extractArgsFromBody(request: express.Request): ControllerRequestArguments {
+  return Object.entries(request.body)
+    .map(([name, value]) => ({ name: name as string, value: typeof value === 'object' ? JSON.stringify(value) : value as string }));
 }
