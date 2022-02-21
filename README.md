@@ -35,10 +35,21 @@ MARIADB_PASS="MariaDB password"
 MARIADB_DB="Database in MariaDB Server to use"
 EXPRESS_PORT="Port for the app to listen on"
 ```
-4. Start the app
+#### 4. Start the app
 ```
 npm start
 ```
+### How to make server use HTTPS?
+#### 1. Create `/ssl` directory in projects main directory
+
+#### 2. Copy your certificate and private key into the newly created `/ssl` dir naming them `certificate.crt` and `private.key` accordingly 
+
+#### 3. Append following line to `.env` file
+```
+EXPRESS_SECURE_PORT="Desired HTTPS listening port"
+```
+
+#### 4. Start the app
 # The Intestines
 ## Overview
 App consists of following parts:
