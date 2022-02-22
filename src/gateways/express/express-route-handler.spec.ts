@@ -18,30 +18,37 @@ describe('Express Route Handler test suite', () => {
   });
   describe('When adding GET route', () => {
     it('Should set handler for given path & method on express app', () => {
-      routeHandler.addGET('/some-path', fakeRequestHandler);
+      routeHandler.addRoute('GET', '/some-path', fakeRequestHandler);
       expect(dummyExpressApp.get)
         .to.have.been.calledOnceWithExactly('/some-path', fakeRequestHandler);
     });
   });
   describe('When adding POST route', () => {
     it('Should set handler for given path & method on express app', () => {
-      routeHandler.addPOST('/some-path', fakeRequestHandler);
+      routeHandler.addRoute('POST', '/some-path', fakeRequestHandler);
       expect(dummyExpressApp.post)
         .to.have.been.calledOnceWithExactly('/some-path', fakeRequestHandler);
     });
   });
   describe('When adding PUT route', () => {
     it('Should set handler for given path & method on express app', () => {
-      routeHandler.addPUT('/some-path', fakeRequestHandler);
+      routeHandler.addRoute('PUT', '/some-path', fakeRequestHandler);
       expect(dummyExpressApp.put)
         .to.have.been.calledOnceWithExactly('/some-path', fakeRequestHandler);
     });
   });
   describe('When adding DELETE route', () => {
     it('Should set handler for given path & method on express app', () => {
-      routeHandler.addDELETE('/some-path', fakeRequestHandler);
+      routeHandler.addRoute('DELETE', '/some-path', fakeRequestHandler);
       expect(dummyExpressApp.delete)
         .to.have.been.calledOnceWithExactly('/some-path', fakeRequestHandler);
+    });
+  });
+  describe('When adding route for unknown method', () => {
+    it('Should throw an error', () => {
+      const tryAddingRoute = () => routeHandler.addRoute('unknown-route' as any, '/some-path', fakeRequestHandler);
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      expect(tryAddingRoute).to.throw;
     });
   });
 });
