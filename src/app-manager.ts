@@ -1,10 +1,12 @@
 import { readFile } from 'fs/promises';
+import { createServer as createHttpsServer } from 'https';
+import { createServer as createHttpServer } from 'http';
 import path from 'path';
 import Controller from './controller/controller';
 import parseSchema from './controller/schema-parser/parse-schema';
 import ErrorFactory from './error/error-factory';
 import ExpressGateway from './gateways/express/expres-gateway';
-import parseRouteSchema from './gateways/express/parse-route-schema';
+import makeExpressGateway from './gateways/express/make-express-gateway';
 import MariaDBConnector from './infrastracture/concrete/mariadb/mariadb-connector';
 import MariaDBStorageVendor from './infrastracture/concrete/mariadb/mariadb-storage-vendor';
 import utilityQueries from './infrastracture/concrete/mariadb/utils/utility-queries';
@@ -47,17 +49,17 @@ export default class AppManager {
   }
 
   private async setupGateway(controller: Controller) {
-    const routeSchema = parseRouteSchema(path.join(__dirname, `..${path.sep}`, 'schemas', 'route_schema.json'));
-    this.gateway = new ExpressGateway(routeSchema, controller);
+    const routeSchemaPath = path.join(__dirname, `..${path.sep}`, 'schemas', 'route_schema.json');
+    this.gateway = makeExpressGateway(controller, routeSchemaPath);
   }
 
   private async startGateway() {
     if (expressConfig.sslPort) {
       const { key, cert } = await this.loadKeyAndCert();
-      this.gateway!.openSecure(cert, key, expressConfig.sslPort);
+      this.gateway!.connector.openHTTPS(createHttpsServer, {cert, key, port: expressConfig.sslPort});
     }
     const port = +<string>process.env.PORT || expressConfig.port || 0;
-    await this.gateway!.open(port, '0.0.0.0');
+    await this.gateway!.connector.openHTTP(createHttpServer as any, {port, host: '0.0.0.0'});
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -68,7 +70,12 @@ export default class AppManager {
   }
 
   async stop() {
-    await (this.gateway as ExpressGateway).close();
-    await this.connector.stop();
+    try {
+      await this.gateway?.connector.closeHTTP();
+      await this.gateway?.connector.closeHTTPS();
+      await this.connector.stop();
+    } catch {
+      console.log('Error occured while stopping the server!');
+    }
   }
 }
