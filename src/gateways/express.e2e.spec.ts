@@ -9,7 +9,7 @@ import Controller from '../controller/controller';
 import MariaDBConnector from '../infrastracture/concrete/mariadb/mariadb-connector';
 import setupInTestEnv from '../infrastracture/concrete/mariadb/utils/setup-in-test-env';
 import cleanupInTestEnv from '../infrastracture/concrete/mariadb/utils/cleanup-in-test-env';
-import parseRouteSchema from './express/parse-route-schema';
+import makeExpressGateway from './express/make-express-gateway';
 
 let expressApp: Express.Application;
 let storageVendor: MariaDBStorageVendor;
@@ -23,10 +23,9 @@ describe('Express Gateway E2E tests', () => {
     storageVendor = new MariaDBStorageVendor(connector);
 
     const controllerSchema = parseSchema(path.join(process.cwd(), 'schemas', 'controller_schema.json'));
-    const routeSchema = parseRouteSchema(path.join(process.cwd(), 'schemas', 'route_schema.json'));
     const controller = new Controller(storageVendor, controllerSchema);
-
-    const gateway = new ExpressGateway(routeSchema, controller);
+    const routeSchemaPath = path.join(process.cwd(), 'schemas', 'route_schema.json');
+    const gateway = makeExpressGateway(controller, routeSchemaPath)
     expressApp = gateway.expressApp;
   });
   after(async () => {
@@ -650,7 +649,7 @@ describe('Express Gateway E2E tests', () => {
               seatNumber: 1,
             });
 
-          expect(response.statusCode).to.equal(404);
+          expect(response.statusCode).to.equal(409);
           expect(response.headers['content-type']).to.include('application/json');
           expect(response.body).to.deep.equal({
             isOk: false,
