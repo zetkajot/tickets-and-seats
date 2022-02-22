@@ -9,10 +9,10 @@ export default class ExpressRouteHandler {
     handler: e.RequestHandler,
   ) {
     const routeAdder = {
-      GET: this.app.get.bind(this, path, handler as any),
-      POST: this.app.post.bind(this, path, handler as any),
-      PUT: this.app.put.bind(this, path, handler as any),
-      DELETE: this.app.delete.bind(this, path, handler as any),
+      GET: this.app.get.bind(this.app, path, handler as any),
+      POST: this.app.post.bind(this.app, path, handler as any),
+      PUT: this.app.put.bind(this.app, path, handler as any),
+      DELETE: this.app.delete.bind(this.app, path, handler as any),
     }[method] ?? (() => { throw new Error('Unknown method!'); });
     routeAdder();
   }
