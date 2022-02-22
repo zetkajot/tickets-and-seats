@@ -4,85 +4,85 @@
       "actionSignature": "findOneEvent", 
       "method": "GET",
       "path": "/events/:id?",
-      "argumentExtractor": "extractArgsFromNamedParams"
+      "argumentExtractor": "namedParamsExtractor"
     },
     {
       "actionSignature": "findEvents", 
       "method": "GET",
       "path": "/find/events",
-      "argumentExtractor": "extractArgsFromQuery"
+      "argumentExtractor": "queryExtractor"
     },
     {
       "actionSignature": "createEvent", 
       "method": "POST",
       "path": "/events",
-      "argumentExtractor": "extractArgsFromBody"
+      "argumentExtractor": "bodyExtractor"
     },
     {
       "actionSignature": "deleteEvent", 
       "method": "DELETE",
       "path": "/events/:id?",
-      "argumentExtractor": "extractArgsFromNamedParams"
+      "argumentExtractor": "namedParamsExtractor"
     },
     {
       "actionSignature": "openEvent", 
       "method": "PUT",
       "path": "/events/:id?/open",
-      "argumentExtractor": "extractArgsFromNamedParams"
+      "argumentExtractor": "namedParamsExtractor"
     },
     {
       "actionSignature": "closeEvent", 
       "method": "PUT",
       "path": "/events/:id?/close",
-      "argumentExtractor": "extractArgsFromNamedParams"
+      "argumentExtractor": "namedParamsExtractor"
     },
     {
       "actionSignature": "getEventSeats", 
       "method": "GET",
       "path": "/events/:id?/seats",
-      "argumentExtractor": "extractArgsFromNamedParams"
+      "argumentExtractor": "namedParamsExtractor"
     },
     {
       "actionSignature": "findOneHall", 
       "method": "GET",
       "path": "/halls/:id?",
-      "argumentExtractor": "extractArgsFromNamedParams"
+      "argumentExtractor": "namedParamsExtractor"
     },
     {
       "actionSignature": "findHalls", 
       "method": "GET",
       "path": "/find/halls",
-      "argumentExtractor": "extractArgsFromQuery"
+      "argumentExtractor": "queryExtractor"
     },
     {
       "actionSignature": "createHall", 
       "method": "POST",
       "path": "/halls",
-      "argumentExtractor": "extractArgsFromBody"
+      "argumentExtractor": "bodyExtractor"
     },
     {
       "actionSignature": "deleteHall", 
       "method": "DELETE",
       "path": "/halls/:id?",
-      "argumentExtractor": "extractArgsFromNamedParams"
+      "argumentExtractor": "namedParamsExtractor"
     },
     {
       "actionSignature": "issueTicket", 
       "method": "POST",
       "path": "/tickets",
-      "argumentExtractor": "extractArgsFromBody"
+      "argumentExtractor": "bodyExtractor"
     },
     {
       "actionSignature": "cancelTicket", 
       "method": "DELETE",
       "path": "/tickets/:id?",
-      "argumentExtractor": "extractArgsFromNamedParams"
+      "argumentExtractor": "namedParamsExtractor"
     },
     {
       "actionSignature": "checkTicket", 
       "method": "GET",
       "path": "/tickets/:id?",
-      "argumentExtractor": "extractArgsFromNamedParams"
+      "argumentExtractor": "namedParamsExtractor"
     }
   ]
 }
